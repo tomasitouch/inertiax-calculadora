@@ -1,44 +1,31 @@
 body {
-  background-color: #f0f2f5;
-  font-family: 'Poppins', sans-serif;
-}
-
-.navbar-brand {
-  font-size: 1.5rem;
-  color: #00bfff !important;
+  background-color: #f6f8fa;
+  font-family: "Poppins", sans-serif;
 }
 
 .card {
   border-radius: 15px;
+  background: #fff;
+}
+
+h2 {
+  letter-spacing: 0.5px;
 }
 
 .btn-primary {
   background-color: #007bff;
   border: none;
-  transition: all 0.2s ease;
 }
 
 .btn-primary:hover {
   background-color: #0056b3;
 }
 
-.btn-danger {
-  background-color: #d62828;
+.btn-success {
+  background-color: #00c851;
   border: none;
 }
 
-.btn-danger:hover {
-  background-color: #b71c1c;
-}
-
-.table {
-  border-radius: 10px;
-  overflow: hidden;
-  font-size: 0.9rem;
-}
-
-#chat-box {
-  font-size: 0.9rem;
-  background: #2b2b2b;
-  border: 1px solid #555;
+.btn-success:hover {
+  background-color: #007e33;
 }
