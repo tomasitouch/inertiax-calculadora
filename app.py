@@ -22,22 +22,27 @@ def home():
 @app.route("/analizar", methods=["POST"])
 def analizar():
     try:
-        # === 1. Leer archivo CSV ===
+        print("✅ Recibida solicitud POST /analizar")
+
         archivo = request.files["archivo"]
-        df = pd.read_csv(archivo, sep=None, engine="python")  # autodetecta el separador
+        print(f"📁 Archivo recibido: {archivo.filename}")
+
+        df = pd.read_csv(archivo, sep=None, engine="python")
+        print("📊 CSV cargado correctamente")
+        print(df.head())
 
         resumen = df.describe().to_string()
 
-        # === 2. Pedir análisis a la IA ===
         prompt = f"""
-        Eres un analista deportivo. Analiza los siguientes datos de rendimiento y
-        entrega un resumen técnico de los resultados, fortalezas, debilidades y
-        sugerencias de mejora para el atleta.
-
+        Eres un analista deportivo de InertiaX. Analiza los datos de entrenamiento y
+        genera un resumen técnico profesional, destacando velocidad, potencia y
+        recomendaciones.
+        
         Datos:
         {resumen}
         """
 
+        print("🧠 Enviando datos al modelo...")
         completion = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
@@ -45,8 +50,10 @@ def analizar():
         )
 
         reporte_texto = completion.choices[0].message.content.strip()
+        print("📄 Respuesta IA recibida correctamente")
 
-        # === 3. Crear documento Word ===
+        from docx import Document
+        import io
         doc = Document()
         doc.add_heading("Reporte de Análisis - InertiaX", level=1)
         doc.add_paragraph(reporte_texto)
@@ -55,7 +62,7 @@ def analizar():
         doc.save(output)
         output.seek(0)
 
-        # === 4. Enviar archivo generado ===
+        print("💾 Documento Word generado correctamente")
         return send_file(
             output,
             as_attachment=True,
@@ -64,5 +71,9 @@ def analizar():
         )
 
     except Exception as e:
-        print("❌ Error en /analizar:", e)
+        print("❌ Error en /analizar:", str(e))
         return jsonify({"error": str(e)}), 500
+
+
+
+
