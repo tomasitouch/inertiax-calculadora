@@ -312,7 +312,7 @@ def execute_ai_charts_code(python_code: str, df: pd.DataFrame) -> List[BytesIO]:
             'plt': plt,
             'sns': sns,
             'np': np,
-            'pd': pd
+            'pd': pd,
             'os': os  # 👈 AGREGA ESTA LÍNEA TAMBIÉN
 
         })
