@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8">
+  <title>Analizador InertiaX</title>
+  <style>
+    body { font-family: Arial; text-align:center; margin-top:50px; }
+    #resultado { white-space: pre-wrap; text-align:left; max-width:600px; margin:auto; }
+  </style>
+</head>
+<body>
+  <h1>📊 Analizador de Rendimiento InertiaX</h1>
+  <form id="formulario">
+    <input type="file" name="archivo" accept=".csv" required>
+    <button type="submit">Analizar CSV</button>
+  </form>
+
+  <div id="resultado"></div>
+
+  <script>
+  document.getElementById("formulario").onsubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+
+    document.getElementById("resultado").innerText = "⏳ Generando reporte...";
+
+    const res = await fetch("/analizar", { method: "POST", body: formData });
+    const data = await res.json();
+
+    document.getElementById("resultado").innerText = data.reporte || data.error;
+  };
+  </script>
+</body>
+</html>
