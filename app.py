@@ -322,7 +322,7 @@ def upload():
 @app.route('/create_preference', methods=['POST'])
 def create_preference():
     # Precio fijo o dinámico por propósito (ajusta a gusto)
-    price = 2900
+    price = 990
     prop = (form_data.get("proposito") or "").lower()
     if "estadístico" in prop:
         price = 3900
