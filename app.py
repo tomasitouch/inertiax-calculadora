@@ -5,7 +5,7 @@ import os
 app = Flask(__name__)
 
 @app.route('/')
-def home():
+def index():
     return render_template('index.html')
 
 @app.route('/upload', methods=['POST'])
@@ -15,16 +15,12 @@ def upload():
         if not file:
             return "No se subió ningún archivo.", 400
 
-        # Leer el CSV con pandas
         df = pd.read_csv(file)
-        # Convertir a HTML (Bootstrap para mejor estilo)
-        table_html = df.to_html(classes='table table-striped table-bordered', index=False)
+        table_html = df.to_html(classes='table table-striped table-bordered display nowrap', index=False)
 
         return render_template('index.html', table_html=table_html, filename=file.filename)
-
     except Exception as e:
-        return f"Error al procesar el archivo: {e}", 500
-
+        return render_template('index.html', error=f"Error al procesar el archivo: {e}")
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
