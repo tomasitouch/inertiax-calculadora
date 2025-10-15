@@ -3,41 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <title>Pago exitoso - InertiaX Analyzer PRO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body {
-      background: #f9fbff;
-      font-family: 'Poppins', sans-serif;
-    }
-    .card {
-      border-radius: 1rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
-    .btn-inertiax {
-      background-color: #0069d9;
-      color: white;
-      font-weight: 500;
-    }
-    .btn-inertiax:hover {
-      background-color: #0056b3;
-      color: white;
-    }
+    body { background:#f9fbff; font-family:'Poppins',sans-serif; }
+    .card { border-radius:1rem; box-shadow:0 4px 20px rgba(0,0,0,.08); }
   </style>
 </head>
 <body>
   <div class="container text-center mt-5">
-    <div class="card mx-auto p-5" style="max-width:600px;">
-      <img src="https://i.imgur.com/mKMwnpM.png" alt="InertiaX Logo" width="100" class="mb-3">
+    <div class="card mx-auto p-5" style="max-width:640px;">
       <h2 class="text-success fw-bold">✅ ¡Pago confirmado!</h2>
-      <p class="text-muted mt-3">
-        Tu transacción ha sido procesada con éxito.  
-        Ya puedes descargar el reporte profesional generado por nuestra IA.
-      </p>
-      <a href="/generate_docx" class="btn btn-inertiax btn-lg mt-3">⬇️ Descargar reporte editable (Word)</a>
-      <div class="mt-4">
-        <a href="/" class="text-decoration-none">Volver al inicio</a>
-      </div>
+      <p class="text-muted mt-2">Tu reporte se descargará automáticamente en unos segundos.</p>
+      <a href="/download_bundle" class="btn btn-primary mt-3">⬇️ Descargar ZIP manualmente</a>
+      <div class="mt-3"><a href="/" class="text-decoration-none">Volver al inicio</a></div>
     </div>
   </div>
+
+  <script>
+    // Auto-descarga tras 1.2s
+    setTimeout(()=>{ window.location = "/download_bundle"; }, 1200);
+  </script>
 </body>
 </html>
