@@ -1,28 +1,32 @@
-/* InertiaX PRO */
-body{
-  background: linear-gradient(180deg, #f8fbff, #eef3ff);
-  font-family: 'Poppins', sans-serif;
-  color:#222;
+body {
+  background: linear-gradient(180deg, #f8f9fa 0%, #e9f2ff 100%);
+  font-family: "Poppins", sans-serif;
 }
-.card{
-  border:none;
-  border-radius:1rem;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-}
-h1,h2,h5{ font-weight:700; }
-.btn-primary{ background:#0056b3; border:none; }
-.btn-primary:hover{ background:#003f88; }
-.btn-success{ background:#1e9e61; border:none; }
-.btn-success:hover{ background:#177a4c; }
 
-.table{
-  font-size:.92rem;
-  border-radius:.75rem;
-  overflow:hidden;
+.card {
+  border-radius: 20px;
+  border: none;
 }
-.table thead th{
-  background:#0056b3; color:#fff; border:none;
-}
-.table tbody tr:hover{ background:#f5f9ff; }
 
-footer{ color:#7a7a7a; }
+h1, h5 {
+  letter-spacing: -0.5px;
+}
+
+.btn {
+  border-radius: 12px;
+  transition: 0.2s ease-in-out;
+}
+
+.btn:hover {
+  transform: scale(1.02);
+}
+
+.table {
+  font-size: 0.9rem;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+footer {
+  margin-top: 40px;
+}
