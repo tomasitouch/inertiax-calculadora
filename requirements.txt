@@ -1,5 +1,2 @@
 flask
-flask-cors
 pandas
-openai
-python-docx
