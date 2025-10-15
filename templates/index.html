@@ -1,130 +1,28 @@
-<!-- =====================================================
- 🚀 InertiaX Analyzer PRO 
- Análisis IA con vista previa + descarga de reporte Word
-===================================================== -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>InertiaX CSV Viewer</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body class="bg-dark text-light">
 
-<div id="inertiax-pro" style="font-family:'Poppins',sans-serif; background:linear-gradient(145deg,#0a0a0a,#111827); color:#e5e7eb; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:40px 15px;">
-  <div style="max-width:950px; width:100%; background:#111827; border-radius:18px; box-shadow:0 0 25px rgba(59,130,246,0.3); padding:45px 35px; text-align:center;">
-    
-    <!-- Logo -->
-    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Inertiax_logo_placeholder.png" alt="InertiaX Logo" style="height:70px; margin-bottom:20px;">
-    
-    <h1 style="color:#3b82f6; font-size:2.3rem; margin-bottom:15px;">📊 InertiaX Analyzer PRO</h1>
-    <p style="color:#9ca3af; font-size:1.05rem; margin-bottom:35px;">
-      Sube tu archivo <strong>CSV</strong> y deja que nuestra <strong>IA deportiva</strong> analice el rendimiento del atleta.
-      Visualiza el resumen en pantalla y descarga un reporte profesional editable en formato Word.
-    </p>
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">📊 InertiaX CSV Viewer</h2>
 
-    <!-- === Formulario === -->
-    <form id="formulario">
-      <label for="archivo" style="display:block; margin-bottom:15px; font-weight:500;">Selecciona tu archivo CSV:</label>
-      <input id="archivo" type="file" name="archivo" accept=".csv" required
-        style="background:#0f172a; border:2px dashed #3b82f6; color:#e5e7eb; padding:20px; width:80%; border-radius:10px; cursor:pointer; transition:0.3s; font-size:1rem;">
-      <br><br>
-      <button type="submit" id="analyzeBtn"
-        style="background:#3b82f6; color:white; font-weight:600; border:none; padding:14px 35px; border-radius:10px; cursor:pointer; font-size:1.05rem; transition:all 0.3s;">
-        🚀 Analizar datos
-      </button>
+    <form action="/upload" method="post" enctype="multipart/form-data" class="text-center mb-4">
+      <input type="file" name="file" accept=".csv" class="form-control mb-3" required>
+      <button type="submit" class="btn btn-primary">Cargar CSV</button>
     </form>
 
-    <!-- === Loader / Estado === -->
-    <div id="estado" style="display:none; margin-top:30px; background:#1e293b; color:#f9fafb; padding:20px; border-radius:10px; box-shadow:0 0 10px rgba(59,130,246,0.1);">
-      <div id="spinner" style="margin-bottom:10px;">
-        <div class="loader" style="margin:auto;border:5px solid #1e293b;border-top:5px solid #3b82f6;border-radius:50%;width:45px;height:45px;animation:spin 1s linear infinite;"></div>
+    {% if filename %}
+      <h5 class="text-center mb-3">Archivo cargado: {{ filename }}</h5>
+      <div class="table-responsive">
+        {{ table_html | safe }}
       </div>
-      <p id="estadoTexto" style="color:#93c5fd;">⏳ Analizando datos con IA... por favor espera.</p>
-    </div>
-
-    <!-- === Vista previa del reporte === -->
-    <div id="preview" style="display:none; margin-top:40px; background:#1e293b; border-radius:12px; padding:30px; text-align:left; box-shadow:0 0 15px rgba(59,130,246,0.15); max-height:500px; overflow-y:auto;">
-      <h2 style="color:#3b82f6; text-align:center;">📄 Vista previa del reporte</h2>
-      <div id="contenidoReporte" style="margin-top:25px; white-space:pre-wrap; line-height:1.6;"></div>
-      <div style="text-align:center; margin-top:30px;">
-        <button id="descargarBtn" style="background:#2563eb; color:white; font-weight:600; border:none; padding:12px 28px; border-radius:8px; cursor:pointer; transition:0.3s;">
-          💾 Descargar como Word
-        </button>
-      </div>
-    </div>
-
-    <div id="mensaje" style="margin-top:30px; font-weight:500;"></div>
-
+    {% endif %}
   </div>
-</div>
 
-<!-- === SCRIPT PRINCIPAL === -->
-<script>
-const form = document.getElementById("formulario");
-const estado = document.getElementById("estado");
-const estadoTexto = document.getElementById("estadoTexto");
-const mensaje = document.getElementById("mensaje");
-const preview = document.getElementById("preview");
-const contenidoReporte = document.getElementById("contenidoReporte");
-const descargarBtn = document.getElementById("descargarBtn");
-
-let ultimoArchivo = null;
-
-form.onsubmit = async (e) => {
-  e.preventDefault();
-  const archivo = document.getElementById("archivo").files[0];
-  if (!archivo) return alert("Por favor selecciona un archivo CSV.");
-  
-  ultimoArchivo = archivo;
-  preview.style.display = "none";
-  mensaje.innerHTML = "";
-  estado.style.display = "block";
-  estadoTexto.innerHTML = "⏳ Analizando datos con IA...";
-
-  const formData = new FormData();
-  formData.append("archivo", archivo);
-
-  try {
-    const response = await fetch("https://inertiax-calculadora-1.onrender.com/analizar", {
-      method: "POST",
-      body: formData
-    });
-
-    estado.style.display = "none";
-
-    // Si la respuesta es Word (descarga directa)
-    const tipo = response.headers.get("Content-Type");
-
-    if (tipo && tipo.includes("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
-      // Mostrar mensaje y vista previa (texto IA rápido)
-      mensaje.innerHTML = "✅ <span style='color:#34d399;'>Reporte generado correctamente.</span>";
-
-      // Extraer texto IA resumido desde API secundaria (endpoint /preview si lo agregas)
-      const resumen = "El archivo fue analizado correctamente. El documento Word contiene secciones de Resumen, Fortalezas, Debilidades y Sugerencias. Puedes descargarlo ahora.";
-      contenidoReporte.innerHTML = resumen;
-
-      preview.style.display = "block";
-
-      descargarBtn.onclick = async () => {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "Reporte_InertiaX.docx";
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-      };
-    } else {
-      mensaje.innerHTML = "⚠️ <span style='color:#f87171;'>Error al generar el reporte. Intenta nuevamente.</span>";
-    }
-
-  } catch (error) {
-    estado.style.display = "none";
-    mensaje.innerHTML = "❌ <span style='color:#f87171;'>No se pudo conectar con el servidor.</span>";
-  }
-};
-
-// === CSS Animación ===
-const style = document.createElement("style");
-style.innerHTML = `
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-@media (max-width:700px){ input[type=file]{width:95%!important;} }
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-thumb { background:#3b82f6; border-radius:10px; }
-`;
-document.head.appendChild(style);
-</script>
+</body>
+</html>
