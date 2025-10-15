@@ -411,18 +411,32 @@ def run_ai_analysis(df: pd.DataFrame, meta: Dict) -> str:
 """.strip()
 
     system_prompt = """
-Eres un analista experto en rendimiento deportivo, biomecánica y ciencia del entrenamiento.
-Tu trabajo: combinar estadísticas cuantitativas reales con interpretación aplicada.
-Responde en español, con estructura clara, viñetas cuando convenga, y recomendaciones accionables.
-Incluye:
-1) Resumen ejecutivo (claro y directo).
-2) Hallazgos cuantitativos clave (medias, dispersión, correlaciones, outliers).
-3) Interpretación fisiológica/biomecánica de patrones.
-4) Recomendaciones específicas de entrenamiento y seguimiento.
-5) Limitaciones de los datos y próximos pasos.
-Evita vaguedades. Si faltan variables críticas, indícalo.
-""".strip()
+Eres un analista experto en rendimiento deportivo y ciencia aplicada al entrenamiento.
+Analiza los datos según el contexto, las variables disponibles y las métricas que el usuario desea conocer.
 
+Tu análisis debe incluir:
+1. Resumen ejecutivo.
+2. Estadísticas clave de las variables relevantes.
+3. Análisis estadístico avanzado (tendencias, correlaciones, dispersión, detección de outliers).
+4. Interpretación biomecánica y fisiológica (músculos, potencia, técnica, fatiga, coordinación).
+5. Recomendaciones prácticas para mejorar el rendimiento.
+6. Limitaciones y próximos pasos.
+
+Si el usuario menciona métricas específicas (RM, velocidad máxima, índice de reactividad, etc.),
+prioriza su análisis en esas variables y deriva cálculos relevantes (por ejemplo, RM estimado = (Peso / (1.0278 - 0.0278 * reps)) ).
+"""
+
+
+# Construcción del contexto general
+contexto = (
+    f"Tipo de datos: {meta.get('tipo_datos')}. "
+    f"Propósito: {meta.get('proposito')}. "
+    f"Detalles: {meta.get('detalles')}. "
+    f"Nombre: {meta.get('nombre')}. "
+    f"Métricas de interés: {meta.get('metricas_interes')}."
+)
+
+# Prompt del usuario que se envía al modelo
     user_prompt = f"""
 Contexto: {contexto}
 Datos (muestra): {resumen}
@@ -430,18 +444,27 @@ Datos (muestra): {resumen}
 Cálculos cuantitativos:
 {extended}
 
-Genera el informe siguiendo la estructura solicitada, citando variables por su nombre.
+Genera un informe estructurado siguiendo esta guía:
+1. Resumen ejecutivo
+2. Análisis estadístico (medias, desviaciones, correlaciones, outliers)
+3. Interpretación biomecánica/fisiológica (velocidad, fuerza, potencia, fatiga, RSI, etc.)
+4. Recomendaciones prácticas
+5. Limitaciones y próximos pasos
+
+Cita las variables por su nombre exacto del dataset.
 """.strip()
 
-    completion = ai_client.chat.completions.create(
-        model=app.config["OPENROUTER_MODEL"],
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ],
-        temperature=0.4,
-    )
-    return completion.choices[0].message.content
+completion = ai_client.chat.completions.create(
+    model=app.config["OPENROUTER_MODEL"],
+    messages=[
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
+    ],
+    temperature=0.4,
+)
+
+return completion.choices[0].message.content
+
 
 
 # ==============================
@@ -475,6 +498,8 @@ def upload():
         "proposito": request.form.get("proposito", "").strip(),
         "detalles": request.form.get("detalles", "").strip(),
         "nombre": request.form.get("nombre", "").strip(),
+        "metricas_interes": request.form.get("metricas_interes"),
+
     }
 
     code = request.form.get("codigo_invitado", "").strip()
