@@ -1,8 +1,11 @@
 flask
 pandas
+openpyxl
 matplotlib
 seaborn
 reportlab
 python-docx
 openai
 mercadopago
+requests
+pillow
