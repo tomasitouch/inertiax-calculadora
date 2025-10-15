@@ -305,6 +305,8 @@ def execute_ai_charts_code(python_code: str, df: pd.DataFrame) -> List[BytesIO]:
         import seaborn as sns
         import numpy as np
         import pandas as pd
+        import os  # 👈 AGREGA ESTA LÍNEA
+
         
         local_vars.update({
             'plt': plt,
