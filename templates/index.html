@@ -2,17 +2,17 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>InertiaX CSV Viewer</title>
+  <title>InertiaX CSV + Chat IA</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
 </head>
 <body class="bg-dark text-light">
 
   <div class="container mt-5">
-    <h2 class="text-center mb-4">📊 InertiaX CSV Viewer</h2>
+    <h2 class="text-center mb-4">📊 InertiaX Data Viewer + 🤖 Chat IA</h2>
 
+    <!-- Subida de CSV -->
     <form action="/upload" method="post" enctype="multipart/form-data" class="text-center mb-4">
       <input type="file" name="file" accept=".csv" class="form-control mb-3" required>
       <button type="submit" class="btn btn-primary">Cargar CSV</button>
@@ -30,22 +30,40 @@
         {{ error }}
       </div>
     {% endif %}
+
+    <hr class="my-5">
+
+    <!-- Chat con IA -->
+    <h4 class="text-center mb-3">💬 Asistente de InertiaX</h4>
+    <div id="chat-box" class="p-3 border rounded bg-secondary mb-3" style="height:300px; overflow-y:auto;"></div>
+
+    <div class="input-group">
+      <input type="text" id="userInput" class="form-control" placeholder="Escribe tu pregunta...">
+      <button class="btn btn-success" id="sendBtn">Enviar</button>
+    </div>
   </div>
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
   <script>
-    $(document).ready(function () {
-      $('table').DataTable({
-        responsive: true,
-        paging: true,
-        scrollX: true,
-        language: {
-          url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
-        }
+    $(document).ready(function() {
+      $('#sendBtn').click(async function() {
+        const message = $('#userInput').val().trim();
+        if (!message) return;
+
+        $('#chat-box').append(`<div><b>Tú:</b> ${message}</div>`);
+        $('#userInput').val('');
+
+        const res = await fetch('/chat', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({message})
+        });
+        const data = await res.json();
+        $('#chat-box').append(`<div class="text-info"><b>IA:</b> ${data.response}</div>`);
+        $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
       });
     });
   </script>
+
 </body>
 </html>
