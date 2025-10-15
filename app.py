@@ -384,87 +384,246 @@ def generate_docx(analysis: str, df: pd.DataFrame, logo_buf: BytesIO, meta: Dict
 
 
 
-
 def run_ai_analysis(df: pd.DataFrame, meta: dict) -> str:
-    """Analiza todos los datos con IA. Si el archivo es pequeño, pasa el dataset completo."""
+    """Analiza TODOS los datos con máxima profundidad y contexto."""
     
-    # Determinar tamaño del archivo
+    # 1. USAR TODOS LOS DATOS SIN MUESTREO
     n_rows, n_cols = df.shape
-
-    # Si el dataset es grande, reducimos muestra
-    if n_rows > 500:
-        df_sample = df.sample(500, random_state=42)
-        subset_notice = f"El dataset tiene {n_rows} filas y {n_cols} columnas. Se ha usado una muestra de 500 filas representativas para análisis."
+    dataset_info = f"Dataset completo: {n_rows} filas × {n_cols} columnas. Analizando el 100% de los datos."
+    
+    # 2. PREPARAR DATOS ENRIQUECIDOS
+    # Información estadística detallada
+    stats_info = generate_detailed_stats(df)
+    
+    # Detectar patrones específicos
+    patterns_info = detect_data_patterns(df)
+    
+    # 3. CONVERTIR DATOS MÁS COMPLETOS
+    # Usar formato que preserve mejor la información
+    if n_rows <= 1000:
+        # Para datasets pequeños, pasar datos completos
+        data_preview = df.to_string(max_rows=min(100, n_rows), max_cols=None)
     else:
-        df_sample = df
-        subset_notice = f"El dataset tiene {n_rows} filas y {n_cols} columnas. Se analizaron todos los datos."
-
-    # Convertimos todo a texto legible
-    dataset_text = df_sample.to_csv(index=False)
-
-    # Detectar tipo de datos
-    tipo_prueba = "general"
-    if any("jump" in c.lower() for c in df.columns):
-        tipo_prueba = "salto"
-    elif any("velocity" in c.lower() for c in df.columns):
-        tipo_prueba = "velocidad"
-    elif any("force" in c.lower() for c in df.columns):
-        tipo_prueba = "fuerza"
-    elif any("accel" in c.lower() or "acel" in c.lower() for c in df.columns):
-        tipo_prueba = "aceleración"
-
-    # Construcción del contexto
+        # Para datasets grandes, muestra estratégica + estadísticas
+        sample_df = df.sample(800, random_state=42)
+        data_preview = sample_df.to_string(max_rows=100, max_cols=None)
+        dataset_info += f"\nMuestra representativa de 800 filas para análisis detallado."
+    
+    # 4. DETECCIÓN AVANZADA DE CONTEXTO DEPORTIVO
+    sport_context = detect_sport_context(df, meta)
+    
+    # 5. CONSTRUIR PROMPT MÁS ESPECÍFICO Y DETALLADO
     contexto = (
-        f"Tipo de datos: {meta.get('tipo_datos')}. "
-        f"Propósito: {meta.get('proposito')}. "
-        f"Detalles: {meta.get('detalles')}. "
-        f"Nombre: {meta.get('nombre')}. "
-        f"Métricas de interés: {meta.get('metricas_interes')}. "
-        f"Tipo de prueba detectado: {tipo_prueba}."
+        f"CONTEXTO COMPLETO DEL ANÁLISIS:\n"
+        f"• Atleta: {meta.get('nombre', 'No especificado')}\n"
+        f"• Tipo de datos: {meta.get('tipo_datos', 'No especificado')}\n"
+        f"• Propósito específico: {meta.get('proposito', 'No especificado')}\n"
+        f"• Detalles adicionales: {meta.get('detalles', 'No especificados')}\n"
+        f"• Métricas de interés: {meta.get('metricas_interes', 'Todas disponibles')}\n"
+        f"• Contexto deportivo detectado: {sport_context}\n"
+        f"• {dataset_info}\n\n"
+        f"ESTADÍSTICAS DETALLADAS:\n{stats_info}\n\n"
+        f"PATRONES DETECTADOS:\n{patterns_info}"
     )
 
-    # Prompt del sistema
+    # 6. PROMPT DEL SISTEMA MÁS EXIGENTE
     system_prompt = """
-Eres un analista experto en rendimiento deportivo, biomecánica y ciencia del ejercicio.
-Recibirás los datos crudos completos (CSV) de un test físico y debes generar un informe analítico profesional.
+Eres un analista deportivo de élite especializado en biomecánica, fisiología del ejercicio y rendimiento deportivo. Tu tarea es realizar un análisis PROFUNDO y DETALLADO de los datos.
 
-Incluye:
-1. Resumen ejecutivo
-2. Análisis descriptivo de todas las variables
-3. Identificación de patrones, tendencias y outliers
-4. Interpretación biomecánica y fisiológica detallada
-5. Recomendaciones prácticas para el atleta o entrenador
-6. Limitaciones y próximos pasos
+**REQUISITOS DEL ANÁLISIS (OBLIGATORIOS):**
 
-Habla con tono técnico y claro. Refierete siempre a las variables reales del dataset.
+1. **ANÁLISIS EXHAUSTIVO POR VARIABLE:**
+   - Examinar CADA columna del dataset individualmente
+   - Identificar valores atípicos, tendencias y distribuciones
+   - Relacionar cada métrica con implicaciones prácticas deportivas
+
+2. **INTERCONEXIONES Y SINERGIAS:**
+   - Analizar cómo interactúan las diferentes variables
+   - Identificar relaciones causa-efecto entre métricas
+   - Evaluar compensaciones y trade-offs en el rendimiento
+
+3. **ANÁLISIS TEMPORAL Y EVOLUTIVO:**
+   - Detectar patrones de fatiga, aprendizaje o adaptación
+   - Analizar consistencia y variabilidad del rendimiento
+   - Identificar fases críticas en las sesiones
+
+4. **RECOMENDACIONES ESPECÍFICAS Y ACCIONABLES:**
+   - Planes de entrenamiento concretos
+   - Correcciones técnicas específicas
+   - Estrategias de medición y seguimiento
+   - Objetivos cuantificables a corto, medio y largo plazo
+
+5. **ANÁLISIS DE CALIDAD DE DATOS:**
+   - Evaluar la confiabilidad de las mediciones
+   - Identificar posibles errores de captura
+   - Sugerir mejoras en la recolección de datos
+
+**FORMATO DE RESPUESTA:**
+- Usar lenguaje técnico pero aplicado
+- Incluir valores numéricos específicos
+- Proporcionar ejemplos concretos de los datos
+- Ser crítico y constructivo
+- Mínimo 1000 palabras de análisis
 """
 
-    # Prompt del usuario
+    # 7. PROMPT DEL USUARIO MÁS COMPLETO
     user_prompt = f"""
-Contexto:
 {contexto}
 
-{subset_notice}
+**DATOS COMPLETOS PARA ANÁLISIS:**
 
-Datos completos del archivo (CSV):
-{dataset_text}
+**INSTRUCCIONES ESPECÍFICAS:**
+1. Analiza METICULOSAMENTE cada variable y su impacto en el rendimiento
+2. Proporciona un análisis CUANTITATIVO profundo con valores específicos
+3. Identifica al menos 5-7 hallazgos NO OBVIOS que un análisis superficial perdería
+4. Relaciona cada hallazgo con aplicaciones prácticas inmediatas
+5. Incluye recomendaciones ESPECÍFICAS basadas en los patrones detectados
 
-Instrucción:
-Analiza todos los datos entregados y genera un informe detallado, con observaciones específicas sobre rendimiento, fuerza, potencia, velocidad, técnica, fatiga o elasticidad, según corresponda.
-""".strip()
+El cliente espera un análisis de NIVEL PROFESIONAL, no un resumen superficial.
+"""
 
-    completion = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ],
-        temperature=0.4,
-        max_tokens=5000  # permite informes largos
-    )
+    try:
+        completion = ai_client.chat.completions.create(
+            model=app.config["OPENROUTER_MODEL"],
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            temperature=0.3,  # Más preciso y consistente
+            max_tokens=8000,  # Permite análisis más extensos
+            top_p=0.9,
+            frequency_penalty=0.1,
+            presence_penalty=0.1
+        )
+        
+        return completion.choices[0].message.content
+        
+    except Exception as e:
+        log.error(f"Error en análisis IA: {e}")
+        return f"Error en el análisis automatizado. Por favor, contacte soporte. Detalles: {str(e)}"
 
-    return completion.choices[0].message.content
 
+def generate_detailed_stats(df: pd.DataFrame) -> str:
+    """Genera estadísticas detalladas para enriquecer el contexto."""
+    stats = []
+    
+    # Estadísticas por columna
+    for col in df.columns:
+        col_stats = f"\n--- {col} ---\n"
+        
+        # Info básica
+        col_stats += f"Tipo: {df[col].dtype}\n"
+        col_stats += f"No nulos: {df[col].count()}/{len(df)} ({df[col].count()/len(df)*100:.1f}%)\n"
+        
+        # Estadísticas según tipo
+        if pd.api.types.is_numeric_dtype(df[col]):
+            col_stats += f"Media: {df[col].mean():.4f}\n"
+            col_stats += f"Mediana: {df[col].median():.4f}\n"
+            col_stats += f"Std: {df[col].std():.4f}\n"
+            col_stats += f"Min: {df[col].min():.4f}\n"
+            col_stats += f"Max: {df[col].max():.4f}\n"
+            col_stats += f"Q1: {df[col].quantile(0.25):.4f}\n"
+            col_stats += f"Q3: {df[col].quantile(0.75):.4f}\n"
+            
+            # Outliers IQR
+            Q1 = df[col].quantile(0.25)
+            Q3 = df[col].quantile(0.75)
+            IQR = Q3 - Q1
+            lower = Q1 - 1.5 * IQR
+            upper = Q3 + 1.5 * IQR
+            outliers = ((df[col] < lower) | (df[col] > upper)).sum()
+            col_stats += f"Outliers (IQR): {outliers} ({outliers/len(df)*100:.1f}%)\n"
+            
+        elif pd.api.types.is_string_dtype(df[col]) or pd.api.types.is_categorical_dtype(df[col]):
+            unique_vals = df[col].nunique()
+            col_stats += f"Valores únicos: {unique_vals}\n"
+            if unique_vals <= 10:
+                top_vals = df[col].value_counts().head(5)
+                col_stats += "Top valores:\n" + "\n".join([f"  {val}: {count}" for val, count in top_vals.items()])
+        
+        stats.append(col_stats)
+    
+    return "\n".join(stats)
+
+
+def detect_sport_context(df: pd.DataFrame, meta: dict) -> str:
+    """Detecta automáticamente el contexto deportivo específico."""
+    columns_lower = [str(col).lower() for col in df.columns]
+    
+    # Detección por nombres de columnas
+    context_hints = []
+    
+    if any(x in columns_lower for x in ['velocity', 'velocidad', 'speed']):
+        context_hints.append("Análisis de velocidad")
+    if any(x in columns_lower for x in ['force', 'fuerza', 'load', 'carga']):
+        context_hints.append("Análisis de fuerza")
+    if any(x in columns_lower for x in ['jump', 'salto', 'cmj', 'sj']):
+        context_hints.append("Análisis de salto")
+    if any(x in columns_lower for x in ['power', 'potencia']):
+        context_hints.append("Análisis de potencia")
+    if any(x in columns_lower for x in ['heart', 'cardio', 'hr']):
+        context_hints.append("Análisis cardiovascular")
+    if any(x in columns_lower for x in ['repetition', 'rep', 'series', 'set']):
+        context_hints.append("Entrenamiento con cargas")
+    
+    # Combinar con contexto del usuario
+    user_context = meta.get('proposito', '') + ' ' + meta.get('detalles', '')
+    user_context = user_context.lower()
+    
+    if 'velocidad' in user_context or 'speed' in user_context:
+        context_hints.append("Enfoque específico en velocidad")
+    if 'fuerza' in user_context or 'force' in user_context:
+        context_hints.append("Enfoque específico en fuerza")
+    if 'salto' in user_context or 'jump' in user_context:
+        context_hints.append("Enfoque específico en capacidad de salto")
+    
+    return " | ".join(set(context_hints)) if context_hints else "Contexto deportivo general"
+
+
+def detect_data_patterns(df: pd.DataFrame) -> str:
+    """Detecta patrones importantes en los datos."""
+    patterns = []
+    
+    # Patrón 1: Tendencia temporal
+    datetime_col = detect_datetime_col(df)
+    if datetime_col and len(df) > 1:
+        try:
+            df_sorted = df.sort_values(datetime_col)
+            numeric_cols = df_sorted.select_dtypes(include=['number']).columns
+            
+            # Verificar tendencias en primeras columnas numéricas
+            for col in numeric_cols[:2]:  # Máximo 2 columnas
+                if len(df_sorted) > 2:
+                    correlation = df_sorted[col].corr(pd.Series(range(len(df_sorted))))
+                    if abs(correlation) > 0.5:
+                        trend = "creciente" if correlation > 0 else "decreciente"
+                        patterns.append(f"Tendencia temporal {trend} en {col} (r={correlation:.2f})")
+        except:
+            pass
+    
+    # Patrón 2: Relaciones entre variables clave
+    numeric_df = df.select_dtypes(include=['number'])
+    if len(numeric_df.columns) >= 2:
+        corr_matrix = numeric_df.corr()
+        high_corr_pairs = []
+        
+        for i in range(len(corr_matrix.columns)):
+            for j in range(i+1, len(corr_matrix.columns)):
+                if abs(corr_matrix.iloc[i, j]) > 0.7:
+                    col1, col2 = corr_matrix.columns[i], corr_matrix.columns[j]
+                    high_corr_pairs.append(f"{col1} ↔ {col2} (r={corr_matrix.iloc[i, j]:.2f})")
+        
+        if high_corr_pairs:
+            patterns.append("Correlaciones fuertes: " + "; ".join(high_corr_pairs[:3]))
+    
+    # Patrón 3: Distribuciones anómalas
+    for col in numeric_df.columns:
+        skewness = df[col].skew()
+        if abs(skewness) > 1:
+            skew_type = "positiva" if skewness > 0 else "negativa"
+            patterns.append(f"Sesgo {skew_type} pronunciado en {col} (skew={skewness:.2f})")
+    
+    return "\n".join(patterns) if patterns else "No se detectaron patrones evidentes automáticamente"
 
 
 
