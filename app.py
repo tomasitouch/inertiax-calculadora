@@ -437,7 +437,7 @@ contexto = (
 )
 
 # Prompt del usuario que se envía al modelo
-    user_prompt = f"""
+user_prompt = f"""
 Contexto: {contexto}
 Datos (muestra): {resumen}
 
