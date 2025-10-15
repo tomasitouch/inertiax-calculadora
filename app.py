@@ -313,6 +313,8 @@ def execute_ai_charts_code(python_code: str, df: pd.DataFrame) -> List[BytesIO]:
             'sns': sns,
             'np': np,
             'pd': pd
+            'os': os  # 👈 AGREGA ESTA LÍNEA TAMBIÉN
+
         })
         
         # Ejecutar el código generado por la IA
@@ -335,6 +337,7 @@ def generate_pdf_from_ai(ai_result: dict, charts: List[BytesIO], meta: dict) -> 
     from reportlab.lib.pagesizes import letter
     from reportlab.pdfgen import canvas
     from reportlab.lib.utils import ImageReader
+
     
     pdf_path = os.path.join(app.config["UPLOAD_DIR"], f"reporte_ia_{uuid.uuid4().hex}.pdf")
     c = canvas.Canvas(pdf_path, pagesize=letter)
