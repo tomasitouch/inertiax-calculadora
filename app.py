@@ -48,7 +48,7 @@ class Config:
     
     # OpenAI Config (tu API key)
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "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")
-    OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
+    OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
 
     # UI
     LOGO_URL = os.getenv("LOGO_URL", "https://scontent-scl3-1.cdninstagram.com/v/t51.2885-19/523933037_17845198551536603_8934147041556657694_n.jpg?efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLmRqYW5nby4xMDgwLmMyIn0&_nc_ht=scontent-scl3-1.cdninstagram.com&_nc_cat=111&_nc_oc=Q6cZ2QHOy6rgcBc7EW5ZszSp4lJTdyOpbiDr73ZBLQu3R0fFLrhnThZGWbbGejuqVpYJ9a4&_nc_ohc=hYgEXbr2xVoQ7kNvwGzhiGQ&_nc_gid=HUhI8RtTJJyKdKSj0v0qOQ&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_Afd9hP8K3ACP2osMWfw_db9f5k_-SUItXzjPX0kUjnd79A&oe=68F4E13F&_nc_sid=7a9f4b")
