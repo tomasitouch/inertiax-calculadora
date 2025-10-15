@@ -2,70 +2,64 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>InertiaX Analytics</title>
+  <title>InertiaX Analyzer</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-  <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/3/3a/Logo_inertial.png">
 </head>
 <body>
-  <nav class="navbar navbar-dark bg-dark shadow-sm mb-4">
-    <div class="container">
-      <a class="navbar-brand fw-bold text-primary" href="#">InertiaX Analytics</a>
-    </div>
-  </nav>
-
-  <div class="container">
+  <div class="container mt-5">
     <div class="card shadow-lg p-4">
-      <h2 class="text-center mb-4">📈 Subir datos de rendimiento</h2>
-
-      <form action="/upload" method="post" enctype="multipart/form-data" class="text-center">
-        <input type="file" name="file" accept=".csv" class="form-control mb-3" required>
-        <button type="submit" class="btn btn-primary w-100">Cargar CSV</button>
-      </form>
-
-      {% if filename %}
-        <h5 class="text-center mt-4 text-muted">Archivo cargado: {{ filename }}</h5>
-        <div class="table-responsive mt-3">{{ table_html | safe }}</div>
-
-        <div class="text-center mt-4">
-          <a href="/generate_pdf" target="_blank" class="btn btn-danger">📄 Generar PDF con análisis y gráficos</a>
-          <a href="/download_pdf" class="btn btn-secondary ms-2">⬇️ Descargar PDF</a>
+      <h2 class="text-center mb-4 text-primary fw-bold">📊 InertiaX Analyzer PRO</h2>
+      <form action="/upload" method="post" enctype="multipart/form-data">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Tipo de datos</label>
+            <input type="text" class="form-control" name="tipo_datos" placeholder="Ej. mediciones de velocidad, saltos, fuerza..." required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Nombre del deportista / entrenador</label>
+            <input type="text" class="form-control" name="nombre" placeholder="Ej. Camila Torres">
+          </div>
         </div>
-      {% endif %}
 
-      {% if error %}
-        <div class="alert alert-danger mt-4">{{ error }}</div>
-      {% endif %}
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Propósito del análisis</label>
+            <select class="form-select" name="proposito" required>
+              <option value="Generar reporte editable para deportista">Reporte editable para deportista</option>
+              <option value="Generar análisis estadístico">Análisis estadístico</option>
+              <option value="Generar análisis avanzado">Análisis avanzado</option>
+              <option value="Todo">Todo</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Detalles adicionales</label>
+            <textarea name="detalles" class="form-control" rows="1" placeholder="Ej. Ciclo de potencia, prueba de 1RM, test de salto..."></textarea>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Archivo CSV</label>
+          <input type="file" name="file" accept=".csv" class="form-control" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">🚀 Subir y procesar datos</button>
+      </form>
     </div>
 
-    <div class="card mt-5 shadow-lg p-4 bg-dark text-light">
-      <h4 class="text-center">💬 Chat con el Asistente IA</h4>
-      <div id="chat-box" class="p-3 mb-3 bg-secondary rounded" style="height:300px; overflow-y:auto;"></div>
-      <div class="input-group">
-        <input type="text" id="userInput" class="form-control" placeholder="Escribe una pregunta sobre tus datos...">
-        <button class="btn btn-success" id="sendBtn">Enviar</button>
+    {% if filename %}
+    <div class="card mt-4 shadow p-4">
+      <h5 class="text-center">Archivo cargado: {{ filename }}</h5>
+      <div class="table-responsive mt-3">{{ table_html | safe }}</div>
+      <div class="text-center mt-4">
+        <a href="/generate_docx" class="btn btn-success">🧾 Generar Word editable</a>
       </div>
     </div>
-  </div>
+    {% endif %}
 
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script>
-    $(document).ready(() => {
-      $('#sendBtn').click(async () => {
-        const msg = $('#userInput').val().trim();
-        if (!msg) return;
-        $('#chat-box').append(`<div><b>Tú:</b> ${msg}</div>`);
-        $('#userInput').val('');
-        const res = await fetch('/chat', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({message: msg})
-        });
-        const data = await res.json();
-        $('#chat-box').append(`<div class="text-info"><b>IA:</b> ${data.response}</div>`);
-        $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
-      });
-    });
-  </script>
+    {% if error %}
+      <div class="alert alert-danger mt-4">{{ error }}</div>
+    {% endif %}
+  </div>
 </body>
 </html>
