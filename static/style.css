@@ -1,18 +1,44 @@
 body {
-  background-color: #0d1117;
-  color: #e6edf3;
+  background-color: #f0f2f5;
+  font-family: 'Poppins', sans-serif;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  color: #00bfff !important;
+}
+
+.card {
+  border-radius: 15px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-danger {
+  background-color: #d62828;
+  border: none;
+}
+
+.btn-danger:hover {
+  background-color: #b71c1c;
 }
 
 .table {
-  background-color: #161b22;
-  color: #e6edf3;
-  border-color: #30363d;
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 0.9rem;
 }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button {
-  color: #58a6ff !important;
-}
-
-h2 {
-  color: #58a6ff;
+#chat-box {
+  font-size: 0.9rem;
+  background: #2b2b2b;
+  border: 1px solid #555;
 }
