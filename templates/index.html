@@ -1,139 +1,113 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>InertiaX Analyzer PRO</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-
-  <!-- DataTables -->
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
-
-  <!-- Estilos personalizados -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <meta charset="UTF-8">
+    <title>InertiaX | Análisis Inteligente</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-
-<body class="bg-light">
-  <div class="container my-5">
-    <!-- HEADER -->
+<body>
+<div class="container py-5">
     <div class="text-center mb-4">
-      <img src="https://scontent-scl3-1.cdninstagram.com/v/t51.2885-19/523933037_17845198551536603_8934147041556657694_n.jpg?efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLmRqYW5nby4xMDgwLmMyIn0&_nc_ht=scontent-scl3-1.cdninstagram.com&_nc_cat=111&_nc_oc=Q6cZ2QHOy6rgcBc7EW5ZszSp4lJTdyOpbiDr73ZBLQu3R0fFLrhnThZGWbbGejuqVpYJ9a4&_nc_ohc=hYgEXbr2xVoQ7kNvwGzhiGQ&_nc_gid=HUhI8RtTJJyKdKSj0v0qOQ&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_Afd9hP8K3ACP2osMWfw_db9f5k_-SUItXzjPX0kUjnd79A&oe=68F4E13F&_nc_sid=7a9f4b"
-           alt="InertiaX" width="110" class="rounded-circle shadow-sm mb-3">
-      <h1 class="fw-bold text-primary">📊 InertiaX Analyzer PRO</h1>
-      <p class="text-muted">IA deportiva para análisis de rendimiento — CSV / Excel</p>
+        <img src="{{ url_for('static', filename='logo_inertiax.png') }}" class="logo-img" alt="InertiaX Logo">
+        <h1 class="mt-3 fw-bold text-primary">InertiaX Análisis Automático</h1>
+        <p class="text-muted">Sube tus datos. Deja que nuestra IA haga el resto.</p>
     </div>
-
-    <!-- FORMULARIO -->
-    <div class="card shadow-lg p-4">
-      <form action="/upload" method="post" enctype="multipart/form-data">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">Tipo de datos</label>
-            <input type="text" name="tipo_datos" class="form-control" placeholder="Ej. saltos, sprint, potencia..." required />
-          </div>
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">Nombre del deportista / entrenador</label>
-            <input type="text" name="nombre" class="form-control" placeholder="Ej. Camila Torres" />
-          </div>
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">Propósito del análisis</label>
-            <select name="proposito" class="form-select" required>
-              <option value="Generar reporte editable para deportista">Reporte editable para deportista</option>
-              <option value="Generar análisis estadístico">Análisis estadístico</option>
-              <option value="Generar análisis avanzado">Análisis avanzado</option>
-              <option value="Todo">Todo</option>
-            </select>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">Detalles adicionales</label>
-            <textarea name="detalles" rows="1" class="form-control" placeholder="Ej. fase competitiva, 1RM, test de salto..."></textarea>
-          </div>
-          <div class="col-12">
-            <label class="form-label fw-semibold">Archivo (CSV o Excel)</label>
-            <input type="file" name="file" accept=".csv,.xlsx,.xls" class="form-control" required />
-          </div>
-
-          <!-- CÓDIGO DE INVITADO -->
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">Código de invitado (opcional)</label>
-            <input type="text" name="codigo_invitado" class="form-control" placeholder="Ej. INERTIAXVIP2025">
-          </div>
-        </div>
-
-        <button class="btn btn-primary w-100 mt-3 fw-semibold">🚀 Subir y procesar datos</button>
-      </form>
-    </div>
-
-    <!-- TABLA + PAGO -->
-    {% if filename %}
-      <div class="card mt-4 shadow p-4">
-        <h5 class="text-center text-success">✅ Archivo cargado: {{ filename }}</h5>
-        <p class="text-center text-muted">Visualiza, ordena y filtra tu tabla libremente</p>
-
-        <div class="table-responsive">
-          <table id="dataTable" class="display nowrap" style="width:100%">
-            {{ table_html | safe }}
-          </table>
-        </div>
-
-        {% if show_payment %}
-        <div class="text-center mt-4">
-          <button id="mp-button" class="btn btn-success btn-lg shadow-sm">💳 Pagar con Mercado Pago</button>
-        </div>
-        {% else %}
-        <div class="text-center mt-4">
-          <a href="/download_bundle" class="btn btn-primary btn-lg shadow-sm">📥 Descargar Reporte</a>
-        </div>
-        {% endif %}
-      </div>
-    {% endif %}
-
-    {% if mensaje %}
-      <div class="alert alert-info mt-4 text-center">{{ mensaje }}</div>
-    {% endif %}
 
     {% if error %}
-      <div class="alert alert-danger mt-4 text-center">{{ error }}</div>
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    {% if mensaje %}
+        <div class="alert alert-success">{{ mensaje }}</div>
     {% endif %}
 
-    <footer class="text-center mt-5 text-muted">
-      <small>© 2025 InertiaX SpA — Tecnología Deportiva Avanzada</small>
-    </footer>
-  </div>
+    <form action="/upload" method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Tu nombre o institución</label>
+                <input type="text" name="nombre" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Tipo de datos</label>
+                <select class="form-select" name="tipo_datos" required>
+                    <option value="">Selecciona...</option>
+                    <option>Datos de entrenamiento (fuerza, velocidad, potencia)</option>
+                    <option>Datos de salto o potencia muscular</option>
+                    <option>Datos de laboratorio o pruebas</option>
+                    <option>Otro tipo</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Propósito del análisis</label>
+                <select class="form-select" name="proposito" required>
+                    <option>Generar reporte editable para deportista</option>
+                    <option>Generar análisis estadístico</option>
+                    <option>Generar análisis avanzado</option>
+                    <option>Todo</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Código de invitado (opcional)</label>
+                <input type="text" name="codigo_invitado" class="form-control" placeholder="Ej: INERTIAXVIP2025">
+            </div>
+            <div class="col-12">
+                <label class="form-label">Detalles adicionales</label>
+                <textarea class="form-control" name="detalles" rows="2" placeholder="Describe brevemente tu objetivo..."></textarea>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Archivo CSV o Excel</label>
+                <input type="file" name="file" class="form-control" accept=".csv,.xls,.xlsx" required>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <button class="btn btn-primary btn-lg px-5" type="submit">Subir y analizar</button>
+        </div>
+    </form>
 
-  <!-- JS -->
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% if table_html %}
+        <div class="mt-5">
+            <h4 class="fw-semibold">Vista previa de tus datos</h4>
+            <div class="table-responsive">{{ table_html | safe }}</div>
+        </div>
+    {% endif %}
 
-  <script>
-    $(function() {
-      const $table = $('table.table');
-      if ($table.length) {
-        $table.attr('id', 'pandasTable');
-        $('#pandasTable').DataTable({
-          scrollX: true,
-          pageLength: 25,
-          lengthMenu: [10, 25, 50, 100],
-          order: [],
-          responsive: true
-        });
-      }
-    });
-  </script>
+    {% if show_payment %}
+        <div class="text-center mt-4">
+            <h5>Completa el pago para generar tu reporte</h5>
+            <button id="checkout-btn" class="btn btn-success btn-lg mt-2">Pagar con Mercado Pago</button>
+        </div>
+    {% elif table_html %}
+        <div class="text-center mt-4">
+            <h5>Tu código de invitado fue aceptado 🎟️</h5>
+            <a href="/download_bundle" class="btn btn-primary btn-lg mt-2">Generar y Descargar Reporte</a>
+        </div>
+    {% endif %}
 
-  <!-- MERCADO PAGO -->
-  <script src="https://sdk.mercadopago.com/js/v2"></script>
-  <script>
-    const mp = new MercadoPago("APP_USR-dc43649a-3d27-4067-b2f2-aba019a7c75e", { locale: 'es-CL' });
+    <div class="mt-5 text-center">
+        <a href="/preview_pdf" target="_blank" class="btn btn-outline-secondary">Vista previa del PDF</a>
+    </div>
+</div>
 
-    document.getElementById("mp-button")?.addEventListener("click", async () => {
-      const res = await fetch("/create_preference", { method: "POST" });
-      const pref = await res.json();
-      mp.checkout({ preference: { id: pref.id }, autoOpen: true });
-    });
-  </script>
+<footer class="footer mt-5 py-3 bg-light text-center text-muted">
+    <small>© 2025 InertiaX SpA — Tecnología Deportiva Inteligente</small>
+</footer>
+
+<script>
+{% if show_payment %}
+const mp = new MercadoPago("{{ os.getenv('MP_PUBLIC_KEY', 'TEST_PUBLIC_KEY') }}", { locale: 'es-CL' });
+document.getElementById("checkout-btn").addEventListener("click", async () => {
+    const res = await fetch("/create_preference", { method: "POST" });
+    const data = await res.json();
+    if (data.id) {
+        mp.checkout({ preference: { id: data.id }, autoOpen: true });
+    } else {
+        alert("Error creando la preferencia de pago.");
+    }
+});
+{% endif %}
+</script>
+
 </body>
 </html>
