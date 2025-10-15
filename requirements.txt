@@ -1,6 +1,7 @@
 flask
 pandas
-openai
 matplotlib
 seaborn
 reportlab
+python-docx
+openai
