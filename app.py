@@ -6,6 +6,8 @@ from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
+from docx import Document
+from docx.shared import Inches
 import os
 from openai import OpenAI
 import uuid
@@ -19,7 +21,8 @@ client = OpenAI(
 
 UPLOAD_FOLDER = "/tmp"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-current_file_path = None  # Guardamos el último archivo procesado
+current_file_path = None
+form_data = {}  # Aquí guardaremos los datos del formulario
 
 
 @app.route('/')
@@ -27,10 +30,19 @@ def index():
     return render_template('index.html')
 
 
+# -------- FORMULARIO + SUBIDA --------
 @app.route('/upload', methods=['POST'])
 def upload():
-    global current_file_path
+    global current_file_path, form_data
     try:
+        # Datos del formulario
+        form_data = {
+            "tipo_datos": request.form.get("tipo_datos"),
+            "proposito": request.form.get("proposito"),
+            "detalles": request.form.get("detalles"),
+            "nombre": request.form.get("nombre")
+        }
+
         file = request.files['file']
         if not file:
             return "No se subió ningún archivo.", 400
@@ -41,92 +53,103 @@ def upload():
 
         df = pd.read_csv(current_file_path)
         table_html = df.to_html(classes='table table-striped table-hover', index=False)
-        return render_template('index.html', table_html=table_html, filename=file.filename)
+
+        return render_template(
+            'index.html',
+            table_html=table_html,
+            filename=file.filename,
+            form_data=form_data
+        )
     except Exception as e:
         return render_template('index.html', error=f"Error al procesar el archivo: {e}")
 
 
-@app.route('/generate_pdf', methods=['GET'])
-def generate_pdf():
-    global current_file_path
+# -------- GENERAR ANALISIS PROFUNDO Y DOCX --------
+@app.route('/generate_docx', methods=['GET'])
+def generate_docx():
+    global current_file_path, form_data
     try:
         if not current_file_path or not os.path.exists(current_file_path):
             return "No hay datos cargados.", 400
 
         df = pd.read_csv(current_file_path)
 
-        # === IA: análisis textual ===
-        csv_summary = f"Columnas: {list(df.columns)}. Primeras filas: {df.head(3).to_dict(orient='records')}."
-        prompt = f"Analiza los siguientes datos de rendimiento deportivo y genera un informe breve con observaciones y conclusiones.\n{csv_summary}"
+        # === Análisis con IA según el propósito ===
+        resumen = f"Columnas: {list(df.columns)}. Ejemplo de filas: {df.head(3).to_dict(orient='records')}."
+        contexto = (
+            f"Tipo de datos: {form_data.get('tipo_datos')}. "
+            f"Propósito: {form_data.get('proposito')}. "
+            f"Detalles: {form_data.get('detalles')}. "
+            f"Nombre asociado: {form_data.get('nombre')}."
+        )
+
+        prompt = f"""
+        Eres un analista deportivo experto. A partir del siguiente contexto:
+        {contexto}
+
+        Y con los datos cargados:
+        {resumen}
+
+        Genera un informe en formato textual detallado que incluya:
+        - Introducción con descripción del tipo de análisis.
+        - Principales hallazgos y métricas clave (valores medios, desviaciones, tendencias).
+        - Análisis estadístico e interpretación de los resultados.
+        - Recomendaciones o conclusiones personalizadas para el caso indicado.
+        """
 
         completion = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "Eres un experto en análisis de datos deportivos."},
+                {"role": "system", "content": "Eres un experto en análisis deportivo y redacción técnica profesional."},
                 {"role": "user", "content": prompt}
             ]
         )
+
         analysis = completion.choices[0].message.content
 
-        # === Gráficos ===
-        img_bufs = []
-        numeric_cols = df.select_dtypes(include='number').columns
-        if len(numeric_cols) > 0:
-            for col in numeric_cols:
-                fig, ax = plt.subplots()
-                sns.histplot(df[col].dropna(), kde=True, color='#007bff')
-                ax.set_title(f"Distribución de {col}")
-                buf = BytesIO()
-                plt.savefig(buf, format='png', bbox_inches='tight')
-                buf.seek(0)
-                img_bufs.append(buf)
-                plt.close()
+        # --- Crear Word ---
+        doc = Document()
+        doc.add_heading("Reporte InertiaX", 0)
+        doc.add_paragraph(f"Generado para: {form_data.get('nombre')}")
+        doc.add_paragraph(f"Tipo de datos: {form_data.get('tipo_datos')}")
+        doc.add_paragraph(f"Propósito: {form_data.get('proposito')}")
+        doc.add_paragraph(f"Detalles: {form_data.get('detalles')}")
+        doc.add_paragraph("\n")
 
-            # Correlaciones
-            if len(numeric_cols) > 1:
-                corr = df[numeric_cols].corr()
-                fig, ax = plt.subplots(figsize=(5, 4))
-                sns.heatmap(corr, annot=True, cmap="coolwarm")
-                buf = BytesIO()
-                plt.savefig(buf, format='png', bbox_inches='tight')
-                buf.seek(0)
-                img_bufs.append(buf)
-                plt.close()
+        doc.add_heading("Análisis detallado", level=1)
+        doc.add_paragraph(analysis)
 
-        # === Generar PDF ===
-        pdf_buffer = BytesIO()
-        c = canvas.Canvas(pdf_buffer, pagesize=letter)
-        c.setFont("Helvetica-Bold", 14)
-        c.drawString(60, 760, "📊 Reporte de Análisis InertiaX")
-        c.setFont("Helvetica", 11)
-        c.drawString(60, 740, "Análisis automático de datos de rendimiento deportivo")
-        c.line(60, 735, 540, 735)
+        doc.add_page_break()
 
-        text = c.beginText(60, 710)
-        text.setFont("Helvetica", 10)
-        for line in analysis.split('\n'):
-            text.textLine(line)
-        c.drawText(text)
+        doc.add_heading("Datos generales", level=1)
+        table = doc.add_table(rows=1, cols=len(df.columns))
+        hdr_cells = table.rows[0].cells
+        for i, col in enumerate(df.columns):
+            hdr_cells[i].text = col
 
-        y = 400
-        for buf in img_bufs:
-            if y < 200:
-                c.showPage()
-                y = 700
-            img = ImageReader(buf)
-            c.drawImage(img, 60, y - 200, width=480, height=180)
-            y -= 220
+        for _, row in df.head(10).iterrows():  # Solo primeras 10 filas
+            row_cells = table.add_row().cells
+            for i, val in enumerate(row):
+                row_cells[i].text = str(val)
 
-        c.save()
-        pdf_buffer.seek(0)
+        # --- Gráfico ejemplo ---
+        num_cols = df.select_dtypes(include='number').columns
+        if len(num_cols) > 0:
+            plt.figure(figsize=(6, 4))
+            sns.boxplot(data=df[num_cols])
+            plt.title("Distribución de variables numéricas")
+            graph_path = os.path.join(UPLOAD_FOLDER, "temp_plot.png")
+            plt.savefig(graph_path)
+            plt.close()
+            doc.add_picture(graph_path, width=Inches(5.5))
 
-        return send_file(BytesIO(pdf_buffer.getvalue()),
-                         as_attachment=False,
-                         download_name="reporte_inertiax.pdf",
-                         mimetype="application/pdf")
+        output_path = os.path.join(UPLOAD_FOLDER, "reporte_inertiax.docx")
+        doc.save(output_path)
+
+        return send_file(output_path, as_attachment=True, download_name="reporte_inertiax.docx")
 
     except Exception as e:
-        return f"Error al generar PDF: {e}", 500
+        return f"Error al generar el documento: {e}", 500
 
 
 if __name__ == "__main__":
