@@ -9,3 +9,5 @@ openai
 mercadopago
 requests
 pillow
+flask-cors
+
