@@ -106,7 +106,7 @@
   <script src="https://sdk.mercadopago.com/js/v2"></script>
   <script>
     // Reemplaza con tu Public Key (TEST o LIVE)
-    const mp = new MercadoPago("TEST-xxxxxxxxxxxxxxxxxxxxxxxxxxxx", { locale: 'es-CL' });
+    const mp = new MercadoPago("APP_USR-dc43649a-3d27-4067-b2f2-aba019a7c75e", { locale: 'es-CL' });
 
     document.getElementById("mp-button")?.addEventListener("click", async () => {
       const res = await fetch("/create_preference", { method: "POST" });
