@@ -29,6 +29,14 @@
                 <label class="form-label">Tu nombre o institución</label>
                 <input type="text" name="nombre" class="form-control" required>
             </div>
+
+            <div class="col-md-12">
+              <label class="form-label fw-semibold">¿Qué datos te interesa conocer o analizar?</label>
+              <textarea name="metricas_interes" rows="2" class="form-control" 
+                placeholder="Ej: 1RM estimado, velocidad máxima, índice de reactividad, aceleración promedio, fuerza máxima..."></textarea>
+            </div>
+
+            
             <div class="col-md-6">
                 <label class="form-label">Tipo de datos</label>
                 <select class="form-select" name="tipo_datos" required>
@@ -39,6 +47,7 @@
                     <option>Otro tipo</option>
                 </select>
             </div>
+            
             <div class="col-md-6">
                 <label class="form-label">Propósito del análisis</label>
                 <select class="form-select" name="proposito" required>
