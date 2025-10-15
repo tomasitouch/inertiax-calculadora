@@ -5,3 +5,4 @@ seaborn
 reportlab
 python-docx
 openai
+mercadopago
