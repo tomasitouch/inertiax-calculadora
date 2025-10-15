@@ -383,87 +383,96 @@ def generate_docx(analysis: str, df: pd.DataFrame, logo_buf: BytesIO, meta: Dict
     return path
 
 
-def run_ai_analysis(df: pd.DataFrame, meta: Dict) -> str:
-    """Análisis IA profundo: estadísticas reales + interpretación experta."""
-    # Estadística real
-    desc, corr, missing = robust_stats(df)
-    outliers = detect_outliers_iqr(df)
 
-    # Resumen de datos breve
-    resumen = f"Columnas: {list(df.columns)}. Muestra: {df.head(3).to_dict(orient='records')}."
-    contexto = (
-        f"Tipo: {meta.get('tipo_datos')}. Propósito: {meta.get('proposito')}."
-        f" Detalles: {meta.get('detalles')}. Nombre: {meta.get('nombre')}."
-    )
 
-    extended = f"""
-[Estadísticas descriptivas]
-{desc.round(3).to_string()}
-
-[Correlaciones]
-{(corr.round(3).to_string() if corr is not None else 'N/A')}
-
-[Valores faltantes]
-{(missing.round(3).to_string() if missing is not None else 'N/A')}
-
-[Outliers por IQR]
-{(outliers.round(3).to_string() if outliers is not None else 'N/A')}
-""".strip()
-
-    system_prompt = """
-    Eres un analista experto en rendimiento deportivo y ciencia aplicada al entrenamiento.
-    Analiza los datos según el contexto, las variables disponibles y las métricas que el usuario desea conocer.
+def run_ai_analysis(df: pd.DataFrame, meta: dict) -> str:
+    """Analiza todos los datos con IA. Si el archivo es pequeño, pasa el dataset completo."""
     
-    Tu análisis debe incluir:
-    1. Resumen ejecutivo.
-    2. Estadísticas clave de las variables relevantes.
-    3. Análisis estadístico avanzado (tendencias, correlaciones, dispersión, detección de outliers).
-    4. Interpretación biomecánica y fisiológica (músculos, potencia, técnica, fatiga, coordinación).
-    5. Recomendaciones prácticas para mejorar el rendimiento.
-    6. Limitaciones y próximos pasos.
-    
-    Si el usuario menciona métricas específicas (RM, velocidad máxima, índice de reactividad, etc.),
-    prioriza su análisis en esas variables y deriva cálculos relevantes (por ejemplo, RM estimado = (Peso / (1.0278 - 0.0278 * reps)) ).
-    """
+    # Determinar tamaño del archivo
+    n_rows, n_cols = df.shape
 
+    # Si el dataset es grande, reducimos muestra
+    if n_rows > 500:
+        df_sample = df.sample(500, random_state=42)
+        subset_notice = f"El dataset tiene {n_rows} filas y {n_cols} columnas. Se ha usado una muestra de 500 filas representativas para análisis."
+    else:
+        df_sample = df
+        subset_notice = f"El dataset tiene {n_rows} filas y {n_cols} columnas. Se analizaron todos los datos."
 
-    # Construcción del contexto general
+    # Convertimos todo a texto legible
+    dataset_text = df_sample.to_csv(index=False)
+
+    # Detectar tipo de datos
+    tipo_prueba = "general"
+    if any("jump" in c.lower() for c in df.columns):
+        tipo_prueba = "salto"
+    elif any("velocity" in c.lower() for c in df.columns):
+        tipo_prueba = "velocidad"
+    elif any("force" in c.lower() for c in df.columns):
+        tipo_prueba = "fuerza"
+    elif any("accel" in c.lower() or "acel" in c.lower() for c in df.columns):
+        tipo_prueba = "aceleración"
+
+    # Construcción del contexto
     contexto = (
         f"Tipo de datos: {meta.get('tipo_datos')}. "
         f"Propósito: {meta.get('proposito')}. "
         f"Detalles: {meta.get('detalles')}. "
         f"Nombre: {meta.get('nombre')}. "
-        f"Métricas de interés: {meta.get('metricas_interes')}."
+        f"Métricas de interés: {meta.get('metricas_interes')}. "
+        f"Tipo de prueba detectado: {tipo_prueba}."
     )
 
-    # Prompt del usuario que se envía al modelo
+    # Prompt del sistema
+    system_prompt = """
+Eres un analista experto en rendimiento deportivo, biomecánica y ciencia del ejercicio.
+Recibirás los datos crudos completos (CSV) de un test físico y debes generar un informe analítico profesional.
+
+Incluye:
+1. Resumen ejecutivo
+2. Análisis descriptivo de todas las variables
+3. Identificación de patrones, tendencias y outliers
+4. Interpretación biomecánica y fisiológica detallada
+5. Recomendaciones prácticas para el atleta o entrenador
+6. Limitaciones y próximos pasos
+
+Habla con tono técnico y claro. Refierete siempre a las variables reales del dataset.
+"""
+
+    # Prompt del usuario
     user_prompt = f"""
-    Contexto: {contexto}
-    Datos (muestra): {resumen}
-    
-    Cálculos cuantitativos:
-    {extended}
-    
-    Genera un informe estructurado siguiendo esta guía:
-    1. Resumen ejecutivo
-    2. Análisis estadístico (medias, desviaciones, correlaciones, outliers)
-    3. Interpretación biomecánica/fisiológica (velocidad, fuerza, potencia, fatiga, RSI, etc.)
-    4. Recomendaciones prácticas
-    5. Limitaciones y próximos pasos
-    
-    Cita las variables por su nombre exacto del dataset.
-    """.strip()
-    
-    completion = ai_client.chat.completions.create(
-        model=app.config["OPENROUTER_MODEL"],
+Contexto:
+{contexto}
+
+{subset_notice}
+
+Datos completos del archivo (CSV):
+{dataset_text}
+
+Instrucción:
+Analiza todos los datos entregados y genera un informe detallado, con observaciones específicas sobre rendimiento, fuerza, potencia, velocidad, técnica, fatiga o elasticidad, según corresponda.
+""".strip()
+
+    completion = client.chat.completions.create(
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
         temperature=0.4,
+        max_tokens=5000  # permite informes largos
     )
-    
+
     return completion.choices[0].message.content
+
+
+
+
+
+
+
+
+
 
 
 
