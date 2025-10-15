@@ -183,18 +183,19 @@ def run_complete_ai_analysis(df: pd.DataFrame, meta: dict) -> dict:
         for col in numeric_cols[:5]:  # Máximo 5 columnas para no saturar
             stats_info += f"{col}: media={df[col].mean():.3f}, std={df[col].std():.3f}, min={df[col].min():.3f}, max={df[col].max():.3f}\n"
 
-    # Construir contexto completo
-    contexto = f"""
-DATOS DEL ANÁLISIS:
-- Atleta: {meta.get('nombre', 'No especificado')}
-- Tipo de datos: {meta.get('tipo_datos', 'No especificado')}
-- Propósito: {meta.get('proposito', 'No especificado')}
-- Detalles: {meta.get('detalles', 'No especificados')}
-- Dataset: {n_rows} filas × {n_cols} columnas
-- Columnas: {', '.join(df.columns.tolist())}
-
-{stats_info}
-"""
+    # Construir contexto completo usando formato seguro
+    contexto_lines = [
+        "DATOS DEL ANÁLISIS:",
+        f"- Atleta: {meta.get('nombre', 'No especificado')}",
+        f"- Tipo de datos: {meta.get('tipo_datos', 'No especificado')}",
+        f"- Propósito: {meta.get('proposito', 'No especificado')}",
+        f"- Detalles: {meta.get('detalles', 'No especificados')}",
+        f"- Dataset: {n_rows} filas × {n_cols} columnas",
+        f"- Columnas: {', '.join(df.columns.tolist())}",
+        "",
+        stats_info
+    ]
+    contexto = "\n".join(contexto_lines)
 
     # PROMPT MAESTRO - La IA hace TODO
     system_prompt = """
@@ -245,26 +246,25 @@ El código Python debe:
 - Ser ejecutable directamente
 """
 
-    user_prompt = f"""
-{contexto}
-
-DATOS CRUDOS (primeras filas):
-```csv
-{data_preview}
-INSTRUCCIONES FINALES:
-
-Analiza TODOS los datos en profundidad
-
-Genera código Python para gráficos deportivos RELEVANTES
-
-Proporciona un análisis que un entrenador profesional pueda usar inmediatamente
-
-Sé específico, técnico y aplicado
-
-Incluye valores numéricos concretos y hallazgos accionables
-
-¡La calidad del análisis depende completamente de ti! Entrega un trabajo de nivel profesional.
-"""
+    # User prompt con formato seguro
+    user_prompt_lines = [
+        contexto,
+        "",
+        "DATOS CRUDOS (primeras filas):",
+        "```csv",
+        data_preview,
+        "```",
+        "",
+        "**INSTRUCCIONES FINALES:**",
+        "1. Analiza TODOS los datos en profundidad",
+        "2. Genera código Python para gráficos deportivos RELEVANTES", 
+        "3. Proporciona un análisis que un entrenador profesional pueda usar inmediatamente",
+        "4. Sé específico, técnico y aplicado",
+        "5. Incluye valores numéricos concretos y hallazgos accionables",
+        "",
+        "¡La calidad del análisis depende completamente de ti! Entrega un trabajo de nivel profesional."
+    ]
+    user_prompt = "\n".join(user_prompt_lines)
 
     try:
         response = ai_client.chat.completions.create(
@@ -280,10 +280,9 @@ Incluye valores numéricos concretos y hallazgos accionables
         
         result = json.loads(response.choices[0].message.content)
         return result
-    
+        
     except Exception as e:
         log.error(f"Error en análisis IA completo: {e}")
-
         return {
             "analysis": f"Error en el análisis: {str(e)}",
             "python_code_for_charts": "",
@@ -296,7 +295,7 @@ def execute_ai_charts_code(python_code: str, df: pd.DataFrame) -> List[BytesIO]:
     """Ejecuta el código Python generado por la IA para producir gráficos."""
     if not python_code.strip():
         return []
-
+    
     try:
         # Crear un entorno seguro para ejecutar el código
         local_vars = {'df': df, 'BytesIO': BytesIO, 'plt': None, 'sns': None}
@@ -323,33 +322,33 @@ def execute_ai_charts_code(python_code: str, df: pd.DataFrame) -> List[BytesIO]:
             charts = []
             
         return charts
-    
+        
     except Exception as e:
         log.error(f"Error ejecutando código de gráficos IA: {e}")
         return []
-    
+
 
 def generate_pdf_from_ai(ai_result: dict, charts: List[BytesIO], meta: dict) -> str:
     """Genera PDF usando el análisis y gráficos creados por la IA."""
     from reportlab.lib.pagesizes import letter
     from reportlab.pdfgen import canvas
     from reportlab.lib.utils import ImageReader
-
+    
     pdf_path = os.path.join(app.config["UPLOAD_DIR"], f"reporte_ia_{uuid.uuid4().hex}.pdf")
     c = canvas.Canvas(pdf_path, pagesize=letter)
-
+    
     # Header
     c.setFont("Helvetica-Bold", 16)
     c.drawString(100, 750, "Reporte Profesional InertiaX - Análisis IA")
     c.setFont("Helvetica", 10)
     c.drawString(100, 730, f"Atleta: {meta.get('nombre', '-')}")
     c.drawString(100, 715, f"Análisis generado: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M')}")
-
+    
     # Análisis de IA
     c.setFont("Helvetica-Bold", 12)
     c.drawString(50, 680, "ANÁLISIS COMPLETO:")
     c.setFont("Helvetica", 9)
-
+    
     # Función para wrap text
     def _wrap_text(text, x, y, max_width=90):
         lines = []
@@ -372,10 +371,10 @@ def generate_pdf_from_ai(ai_result: dict, charts: List[BytesIO], meta: dict) -> 
             c.drawString(x, y, line)
             y -= 12
         return y
-
+    
     y_position = 660
     y_position = _wrap_text(ai_result.get('analysis', 'No analysis generated'), 50, y_position)
-
+    
     # Gráficos
     for i, chart_buf in enumerate(charts):
         c.showPage()
@@ -386,13 +385,13 @@ def generate_pdf_from_ai(ai_result: dict, charts: List[BytesIO], meta: dict) -> 
             c.drawImage(ImageReader(chart_buf), 50, 400, width=500, height=300)
         except Exception as e:
             c.drawString(50, 500, f"Error cargando gráfico: {e}")
-
+    
     # Recomendaciones
     c.showPage()
     c.setFont("Helvetica-Bold", 14)
     c.drawString(50, 750, "RECOMENDACIONES ESPECÍFICAS")
     c.setFont("Helvetica", 10)
-
+    
     recommendations = ai_result.get('recommendations', [])
     if isinstance(recommendations, list):
         y_pos = 720
@@ -404,26 +403,27 @@ def generate_pdf_from_ai(ai_result: dict, charts: List[BytesIO], meta: dict) -> 
             y_pos -= 15
     else:
         _wrap_text(str(recommendations), 50, 720)
-
+    
     c.save()
     return pdf_path
+
 
 def generate_docx_from_ai(ai_result: dict, charts: List[BytesIO], meta: dict) -> str:
     """Genera DOCX usando el análisis y gráficos de la IA."""
     from docx import Document
     from docx.shared import Inches
-
+    
     doc = Document()
-
+    
     # Título
     doc.add_heading('Reporte Profesional InertiaX - Análisis IA', 0)
     doc.add_paragraph(f"Atleta: {meta.get('nombre', '-')}")
     doc.add_paragraph(f"Fecha de análisis: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M')}")
-
+    
     # Análisis
     doc.add_heading('Análisis Completo', level=1)
     doc.add_paragraph(ai_result.get('analysis', 'No analysis generated'))
-
+    
     # Gráficos
     if charts:
         doc.add_heading('Gráficos de Análisis', level=1)
@@ -434,7 +434,7 @@ def generate_docx_from_ai(ai_result: dict, charts: List[BytesIO], meta: dict) ->
                 doc.add_picture(chart_buf, width=Inches(6.0))
             except Exception as e:
                 doc.add_paragraph(f"Error cargando gráfico: {e}")
-
+    
     # Recomendaciones
     doc.add_heading('Recomendaciones', level=1)
     recommendations = ai_result.get('recommendations', [])
@@ -443,20 +443,25 @@ def generate_docx_from_ai(ai_result: dict, charts: List[BytesIO], meta: dict) ->
             doc.add_paragraph(rec, style='List Bullet')
     else:
         doc.add_paragraph(str(recommendations))
-
+    
     path = os.path.join(app.config["UPLOAD_DIR"], f"reporte_ia_{uuid.uuid4().hex}.docx")
     doc.save(path)
     return path
 
 
+# ==============================
+# Rutas
+# ==============================
 
 @app.route("/healthz")
 def healthz():
     return jsonify(ok=True), 200
 
+
 @app.route("/")
 def index():
     return render_template("index.html")
+
 
 @app.route("/upload", methods=["POST"])
 def upload():
@@ -516,13 +521,13 @@ def upload():
     except Exception as e:
         log.exception("Error al procesar DF")
         return render_template("index.html", error=f"Error al procesar el archivo: {e}")
-@app.route("/create_preference", methods=["POST"])
 
+
+@app.route("/create_preference", methods=["POST"])
 def create_preference():
     """Crea preferencia Mercado Pago."""
     if not mp:
         return jsonify(error="Mercado Pago no configurado"), 500
-
 
     job_id = session.get("job_id")
     if not job_id:
@@ -561,7 +566,6 @@ def create_preference():
     except Exception as e:
         log.exception("Error creando preferencia MP")
         return jsonify(error=str(e)), 500
-    
 
 
 @app.route("/success")
@@ -575,9 +579,11 @@ def success():
     _save_meta(job_id, meta)
     return render_template("success.html")
 
+
 @app.route("/cancel")
 def cancel():
     return render_template("cancel.html")
+
 
 @app.route("/generate_report")
 def generate_report():
@@ -624,7 +630,7 @@ def generate_report():
     except Exception as e:
         log.exception("Error generando reporte con IA")
         return render_template("index.html", error=f"Error en el análisis IA: {e}")
-    
+
 
 @app.route("/preview_analysis")
 def preview_analysis():
@@ -632,7 +638,6 @@ def preview_analysis():
     job_id = session.get("job_id")
     if not job_id:
         return redirect(url_for("index"))
-
 
     meta = _load_meta(job_id)
     if not meta.get("payment_ok"):
@@ -660,19 +665,29 @@ def preview_analysis():
         return render_template("index.html", error=f"Error en vista previa: {e}")
 
 
+# ==============================
+# Errores globales
+# ==============================
+
 @app.errorhandler(413)
 def too_large(_e):
     return make_response(("Archivo demasiado grande.", 413))
 
+
 @app.errorhandler(404)
 def not_found(_e):
     return make_response(("Ruta no encontrada.", 404))
+
 
 @app.errorhandler(Exception)
 def global_error(e):
     log.exception("Error no controlado")
     return make_response((f"Error interno: {e}", 500))
 
+
+# ==============================
+# Run
+# ==============================
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "10000"))
