@@ -11,3 +11,4 @@ requests
 pillow
 openai
 gunicorn
+scipy
