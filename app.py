@@ -808,8 +808,10 @@ def upload():
             "codigo_invitado": request.form.get("codigo_invitado", "").strip(),
         }
 
+        print(f"📥 Datos del formulario recibidos: {form}")
+
         # Verificar código de invitado
-        code = form.get("codigo_invitado", "").strip()
+        code = form.get("codigo_invitado", "")
         payment_ok = False
         mensaje = None
         if code and code in app.config["GUEST_CODES"]:
@@ -817,16 +819,20 @@ def upload():
             mensaje = "🔓 Código de invitado válido. Puedes generar tu reporte."
 
         f = request.files.get("file")
+        print(f"📁 Archivo recibido: {f.filename if f else 'None'}")
+        
         if not f or f.filename == "":
             return render_template("index.html", error="No se subió ningún archivo.")
 
         if not _allowed_file(f.filename):
             return render_template("index.html", error="Formato no permitido. Usa .csv, .xls o .xlsx")
 
+        # Guardar archivo
         ext = os.path.splitext(f.filename)[1].lower()
         safe_name = f"{uuid.uuid4().hex}{ext}"
         save_path = os.path.join(_job_dir(job_id), safe_name)
         f.save(save_path)
+        print(f"💾 Archivo guardado en: {save_path}")
 
         # Persistir meta
         meta = {
@@ -840,14 +846,19 @@ def upload():
         # Previsualización simple
         try:
             df = parse_dataframe(save_path)
+            print(f"📊 DataFrame cargado: {df.shape[0]} filas, {df.shape[1]} columnas")
+            
             df = preprocess_data_by_origin(df, form.get("origen_app", ""))
+            print(f"🔧 DataFrame procesado: {df.shape[0]} filas, {df.shape[1]} columnas")
             
             # Generar tabla HTML para previsualización
             table_html = df.head(10).to_html(
-                classes="table table-striped table-bordered table-hover", 
+                classes="table table-striped table-bordered", 
                 index=False,
                 escape=False
             )
+            
+            print("✅ Previsualización generada exitosamente")
             
             return render_template(
                 "index.html",
@@ -857,13 +868,17 @@ def upload():
                 mensaje=mensaje,
                 show_payment=(not payment_ok),
             )
+            
         except Exception as e:
+            print(f"❌ Error procesando archivo: {str(e)}")
             log.exception("Error al procesar archivo")
             return render_template("index.html", error=f"Error al procesar el archivo: {str(e)}")
             
     except Exception as e:
+        print(f"💥 Error general en upload: {str(e)}")
         log.exception("Error general en upload")
         return render_template("index.html", error=f"Error en el servidor: {str(e)}")
+
 
 
 
