@@ -9,14 +9,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --dark-bg: #0f0f23;
-            --darker-bg: #0a0a1a;
-            --card-bg: #1a1a2e;
-            --accent: #00d4ff;
-            --text-primary: #ffffff;
-            --text-secondary: #b0b0d0;
+            --carbon-black: #0D0D0D;
+            --dark-carbon: #1A1A1A;
+            --pure-white: #FFFFFF;
+            --light-gray: #CFCFCF;
+            --lighter-gray: #D9D9D9;
+            --accent-blue: #00A8FF;
+            --accent-purple: #9C27B0;
         }
 
         * {
@@ -27,22 +26,20 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--dark-bg);
-            color: var(--text-primary);
+            background: var(--carbon-black);
+            color: var(--pure-white);
             min-height: 100vh;
             overflow-x: hidden;
         }
 
         .navbar-brand {
             font-weight: 800;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--pure-white);
             font-size: 1.8rem;
         }
 
         .hero-section {
-            background: linear-gradient(135deg, var(--darker-bg) 0%, var(--dark-bg) 100%);
+            background: linear-gradient(135deg, var(--carbon-black) 0%, var(--dark-carbon) 100%);
             position: relative;
             overflow: hidden;
             padding: 100px 0;
@@ -56,8 +53,8 @@
             right: 0;
             bottom: 0;
             background: 
-                radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.1) 0%, transparent 50%);
+                radial-gradient(circle at 20% 80%, rgba(0, 168, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(156, 39, 176, 0.05) 0%, transparent 50%);
             animation: float 6s ease-in-out infinite;
         }
 
@@ -69,9 +66,7 @@
         .hero-title {
             font-size: 3.5rem;
             font-weight: 800;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--pure-white);
             margin-bottom: 1rem;
         }
 
@@ -83,16 +78,16 @@
 
         .hero-subtitle {
             font-size: 1.3rem;
-            color: var(--text-secondary);
+            color: var(--light-gray);
             margin-bottom: 2rem;
             line-height: 1.6;
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
             padding: 2rem;
             transition: all 0.3s ease;
             position: relative;
@@ -106,7 +101,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
             transition: left 0.5s;
         }
 
@@ -116,31 +111,34 @@
 
         .glass-card:hover {
             transform: translateY(-5px);
-            border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
         }
 
         .feature-icon {
-            width: 80px;
-            height: 80px;
-            background: var(--primary-gradient);
-            border-radius: 20px;
+            width: 70px;
+            height: 70px;
+            background: var(--dark-carbon);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
+            font-size: 1.8rem;
             margin-bottom: 1.5rem;
             transition: all 0.3s ease;
+            color: var(--accent-blue);
         }
 
         .feature-card:hover .feature-icon {
-            transform: scale(1.1) rotate(5deg);
-            background: var(--secondary-gradient);
+            transform: scale(1.1);
+            background: rgba(0, 168, 255, 0.1);
+            border-color: var(--accent-blue);
         }
 
         .upload-area {
-            border: 3px dashed rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
             padding: 3rem 2rem;
             text-align: center;
             background: rgba(255, 255, 255, 0.02);
@@ -150,60 +148,60 @@
         }
 
         .upload-area:hover {
-            border-color: var(--accent);
-            background: rgba(0, 212, 255, 0.05);
+            border-color: var(--accent-blue);
+            background: rgba(0, 168, 255, 0.03);
         }
 
         .upload-area.dragover {
-            border-color: var(--accent);
-            background: rgba(0, 212, 255, 0.1);
+            border-color: var(--accent-blue);
+            background: rgba(0, 168, 255, 0.05);
             transform: scale(1.02);
         }
 
-        .btn-gradient {
-            background: var(--primary-gradient);
+        .btn-primary {
+            background: var(--accent-blue);
             border: none;
-            color: white;
+            color: var(--pure-white);
             padding: 12px 30px;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-gradient::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn-gradient:hover::before {
-            left: 100%;
-        }
-
-        .btn-gradient:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-success {
-            background: var(--secondary-gradient);
-            border: none;
-            padding: 12px 30px;
-            border-radius: 50px;
+            border-radius: 8px;
             font-weight: 600;
             transition: all 0.3s ease;
         }
 
-        .btn-success:hover {
+        .btn-primary:hover {
+            background: #0088CC;
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(245, 87, 108, 0.4);
+            box-shadow: 0 8px 20px rgba(0, 168, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--light-gray);
+            border: none;
+            color: var(--carbon-black);
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--lighter-gray);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-light {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--pure-white);
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-light:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
         }
 
         .loading-overlay {
@@ -212,7 +210,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(15, 15, 35, 0.95);
+            background: rgba(13, 13, 13, 0.95);
             display: none;
             justify-content: center;
             align-items: center;
@@ -224,30 +222,33 @@
             width: 3rem;
             height: 3rem;
             border-width: 3px;
+            color: var(--accent-blue);
         }
 
         .table-responsive {
-            border-radius: 15px;
+            border-radius: 12px;
             overflow: hidden;
         }
 
         .table {
-            background: var(--card-bg);
-            color: var(--text-primary);
-            border-radius: 15px;
+            background: var(--dark-carbon);
+            color: var(--pure-white);
+            border-radius: 12px;
         }
 
         .table th {
-            background: var(--primary-gradient);
+            background: var(--carbon-black);
             border: none;
             padding: 1rem;
             font-weight: 600;
+            color: var(--pure-white);
         }
 
         .table td {
-            border-color: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.08);
             padding: 1rem;
             vertical-align: middle;
+            color: var(--light-gray);
         }
 
         .table-striped tbody tr:nth-of-type(odd) {
@@ -269,7 +270,7 @@
 
         .shape {
             position: absolute;
-            background: var(--primary-gradient);
+            background: rgba(255, 255, 255, 0.03);
             border-radius: 50%;
             opacity: 0.1;
             animation: float-shapes 20s infinite linear;
@@ -298,14 +299,15 @@
         }
 
         .feature-badge {
-            background: var(--secondary-gradient);
-            color: white;
+            background: rgba(0, 168, 255, 0.1);
+            color: var(--accent-blue);
             padding: 8px 16px;
-            border-radius: 25px;
+            border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 600;
             display: inline-block;
             margin-bottom: 1rem;
+            border: 1px solid rgba(0, 168, 255, 0.2);
         }
 
         .stats-card {
@@ -316,28 +318,26 @@
         .stats-number {
             font-size: 2.5rem;
             font-weight: 800;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--accent-blue);
             display: block;
         }
 
         .stats-label {
-            color: var(--text-secondary);
+            color: var(--light-gray);
             font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
         .nav-link {
-            color: var(--text-secondary) !important;
+            color: var(--light-gray) !important;
             font-weight: 500;
             transition: all 0.3s ease;
             position: relative;
         }
 
         .nav-link:hover {
-            color: var(--text-primary) !important;
+            color: var(--pure-white) !important;
         }
 
         .nav-link::after {
@@ -347,7 +347,7 @@
             left: 0;
             width: 0;
             height: 2px;
-            background: var(--primary-gradient);
+            background: var(--accent-blue);
             transition: width 0.3s ease;
         }
 
@@ -356,28 +356,28 @@
         }
 
         .form-control, .form-select {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
+            color: var(--pure-white);
             padding: 12px 16px;
-            border-radius: 10px;
+            border-radius: 8px;
             transition: all 0.3s ease;
         }
 
         .form-control:focus, .form-select:focus {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--accent);
-            color: var(--text-primary);
-            box-shadow: 0 0 0 0.2rem rgba(0, 212, 255, 0.25);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-blue);
+            color: var(--pure-white);
+            box-shadow: 0 0 0 0.2rem rgba(0, 168, 255, 0.15);
         }
 
         .form-control::placeholder {
-            color: var(--text-secondary);
+            color: var(--light-gray);
         }
 
         .alert {
             border: none;
-            border-radius: 15px;
+            border-radius: 12px;
             padding: 1rem 1.5rem;
             backdrop-filter: blur(10px);
         }
@@ -395,25 +395,25 @@
         }
 
         footer {
-            background: var(--darker-bg);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--carbon-black);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .social-links a {
-            color: var(--text-secondary);
+            color: var(--light-gray);
             font-size: 1.2rem;
             transition: all 0.3s ease;
             margin: 0 10px;
         }
 
         .social-links a:hover {
-            color: var(--accent);
+            color: var(--accent-blue);
             transform: translateY(-3px);
         }
 
         .typewriter {
             overflow: hidden;
-            border-right: 3px solid var(--accent);
+            border-right: 3px solid var(--accent-blue);
             white-space: nowrap;
             margin: 0 auto;
             animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
@@ -426,7 +426,11 @@
 
         @keyframes blink-caret {
             from, to { border-color: transparent }
-            50% { border-color: var(--accent) }
+            50% { border-color: var(--accent-blue) }
+        }
+
+        .logo-img {
+            filter: brightness(0) invert(1);
         }
     </style>
 </head>
@@ -446,8 +450,8 @@
         </div>
     </div>
 
-<!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background: rgba(15, 15, 35, 0.95); backdrop-filter: blur(20px);">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background: rgba(13, 13, 13, 0.95); backdrop-filter: blur(20px);">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#">
                 <div class="logo-container me-3">
@@ -477,7 +481,6 @@
         </div>
     </nav>
 
-    
     <!-- Hero Section -->
     <section class="hero-section">
         <div class="floating-shapes">
@@ -497,7 +500,7 @@
                         Analiza datos de encoder vertical con inteligencia artificial. Obtén insights profundos, gráficos avanzados y recomendaciones personalizadas para cada atleta.
                     </p>
                     <div class="d-flex flex-wrap gap-3">
-                        <a href="#upload" class="btn btn-gradient">
+                        <a href="#upload" class="btn btn-primary">
                             <i class="fas fa-upload me-2"></i>Comenzar Análisis
                         </a>
                         <a href="#features" class="btn btn-outline-light">
@@ -549,7 +552,7 @@
                             <i class="fas fa-user-group"></i>
                         </div>
                         <h4>Análisis Multi-Atleta</h4>
-                        <p class="text-secondary">Identificación automática y análisis individual para cada deportista con métricas personalizadas.</p>
+                        <p class="text-light-gray">Identificación automática y análisis individual para cada deportista con métricas personalizadas.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -558,7 +561,7 @@
                             <i class="fas fa-chart-line"></i>
                         </div>
                         <h4>Gráficos Avanzados</h4>
-                        <p class="text-secondary">Perfiles fuerza-velocidad, evolución de métricas y comparativas entre atletas.</p>
+                        <p class="text-light-gray">Perfiles fuerza-velocidad, evolución de métricas y comparativas entre atletas.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -567,7 +570,7 @@
                             <i class="fas fa-brain"></i>
                         </div>
                         <h4>IA Especializada</h4>
-                        <p class="text-secondary">Algoritmos de inteligencia artificial entrenados específicamente para análisis deportivo.</p>
+                        <p class="text-light-gray">Algoritmos de inteligencia artificial entrenados específicamente para análisis deportivo.</p>
                     </div>
                 </div>
             </div>
@@ -575,7 +578,7 @@
     </section>
 
     <!-- Upload Section -->
-    <section id="upload" class="py-5" style="background: var(--darker-bg);">
+    <section id="upload" class="py-5" style="background: var(--dark-carbon);">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-10">
@@ -632,20 +635,20 @@
                                     
                                     <!-- Input de archivo visible pero estilizado -->
                                     <div class="upload-area" id="uploadArea">
-                                        <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-primary"></i>
+                                        <i class="fas fa-cloud-upload-alt fa-3x mb-3" style="color: var(--accent-blue);"></i>
                                         <h5>Arrastra tu archivo o haz click aquí</h5>
-                                        <p class="text-secondary">Formatos: CSV, Excel (.xls, .xlsx)</p>
+                                        <p class="text-light-gray">Formatos: CSV, Excel (.xls, .xlsx)</p>
                                         
                                         <!-- Input visible pero integrado visualmente -->
                                         <input type="file" class="form-control mt-3" name="file" id="fileInput" 
                                                accept=".csv,.xls,.xlsx" required onchange="handleFileSelect(this)"
-                                               style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white;">
+                                               style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white;">
                                     </div>
                                     <div id="fileInfo" class="mt-3"></div>
                                 </div>
 
                                 <div class="col-12 text-center">
-                                    <button type="submit" class="btn btn-gradient btn-lg">
+                                    <button type="submit" class="btn btn-primary btn-lg">
                                         <i class="fas fa-bolt me-2"></i>Analizar Datos con IA
                                     </button>
                                 </div>
@@ -673,18 +676,18 @@
                         
                         <div class="mt-4 d-flex flex-wrap gap-3 justify-content-center">
                             {% if show_payment %}
-                            <button class="btn btn-success btn-lg" onclick="initiatePayment()">
+                            <button class="btn btn-primary btn-lg" onclick="initiatePayment()">
                                 <i class="fas fa-credit-card me-2"></i>Generar Reporte Completo - $990 CLP
                             </button>
                             {% else %}
-                            <a href="/generate_report" class="btn btn-success btn-lg">
-                                <i class="fas fa-download me-2"></i>Descargar Reporte Completo
-                            </a>
+                            <button class="btn btn-primary btn-lg" onclick="generateReport()">
+                                <i class="fas fa-download me-2"></i>Generar Reporte Completo
+                            </button>
                             <a href="/preview_analysis" class="btn btn-outline-light btn-lg">
                                 <i class="fas fa-eye me-2"></i>Vista Previa del Análisis
                             </a>
                             {% endif %}
-                            <a href="/" class="btn btn-outline-secondary btn-lg">
+                            <a href="/" class="btn btn-secondary btn-lg">
                                 <i class="fas fa-redo me-2"></i>Nuevo Análisis
                             </a>
                         </div>
@@ -703,7 +706,7 @@
                     <h4 class="mb-4">
                         <i class="fas fa-chart-line me-2"></i>InertiaX
                     </h4>
-                    <p class="text-secondary">Plataforma de análisis deportivo con inteligencia artificial para entrenadores y atletas de alto rendimiento.</p>
+                    <p class="text-light-gray">Plataforma de análisis deportivo con inteligencia artificial para entrenadores y atletas de alto rendimiento.</p>
                 </div>
                 <div class="col-lg-6 text-lg-end">
                     <div class="social-links">
@@ -712,7 +715,7 @@
                         <a href="#"><i class="fab fa-github"></i></a>
                         <a href="#"><i class="fab fa-instagram"></i></a>
                     </div>
-                    <p class="text-secondary mt-3">© 2024 InertiaX. Todos los derechos reservados.</p>
+                    <p class="text-light-gray mt-3">© 2024 InertiaX. Todos los derechos reservados.</p>
                 </div>
             </div>
         </div>
@@ -731,7 +734,6 @@
             return true;
         }
 
-        // Manejar selección de archivo
         // Manejar selección de archivo
         function handleFileSelect(input) {
             const file = input.files[0];
@@ -762,13 +764,13 @@
                 
                 // Actualizar UI
                 document.getElementById('uploadArea').innerHTML = `
-                    <div class="text-success text-center">
+                    <div class="text-center" style="color: var(--accent-blue);">
                         <i class="fas fa-check-circle fa-2x mb-3"></i>
                         <h5>✅ Archivo listo para analizar</h5>
                         <p class="mb-1"><strong>${fileName}</strong></p>
-                        <small class="text-secondary">Tamaño: ${fileSize} MB</small>
+                        <small class="text-light-gray">Tamaño: ${fileSize} MB</small>
                         <br>
-                        <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="resetFileInput()">
+                        <button type="button" class="btn btn-sm btn-outline-light mt-2" onclick="resetFileInput()">
                             <i class="fas fa-redo me-1"></i>Cambiar archivo
                         </button>
                     </div>
@@ -784,37 +786,14 @@
         // Función para resetear el input de archivo
         function resetFileInput() {
             document.getElementById('uploadArea').innerHTML = `
-                <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-primary"></i>
+                <i class="fas fa-cloud-upload-alt fa-3x mb-3" style="color: var(--accent-blue);"></i>
                 <h5>Arrastra tu archivo o haz click aquí</h5>
-                <p class="text-secondary">Formatos: CSV, Excel (.xls, .xlsx)</p>
+                <p class="text-light-gray">Formatos: CSV, Excel (.xls, .xlsx)</p>
                 
                 <input type="file" class="form-control mt-3" name="file" id="fileInput" 
                        accept=".csv,.xls,.xlsx" required onchange="handleFileSelect(this)"
-                       style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white;">
+                       style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white;">
             `;
-        }
-                
-                if (file.size > 20 * 1024 * 1024) {
-                    alert('❌ Archivo demasiado grande. Máximo 20MB');
-                    input.value = '';
-                    return;
-                }
-                
-                // Actualizar UI
-                document.getElementById('uploadArea').innerHTML = `
-                    <div class="text-success">
-                        <i class="fas fa-check-circle fa-2x mb-3"></i>
-                        <h5>Archivo seleccionado</h5>
-                        <p class="mb-1">${fileName}</p>
-                        <small class="text-secondary">Tamaño: ${fileSize} MB</small>
-                    </div>
-                `;
-                
-                document.getElementById('uploadArea').classList.add('dragover');
-                setTimeout(() => {
-                    document.getElementById('uploadArea').classList.remove('dragover');
-                }, 2000);
-            }
         }
 
         // Drag and drop
@@ -845,23 +824,140 @@
             handleFileSelect(document.getElementById('fileInput'));
         }
 
+        // Generar reporte completo
+        function generateReport() {
+            showLoading();
+            
+            console.log('🚀 Iniciando generación de reporte...');
+            
+            fetch('/generate_report')
+                .then(response => {
+                    console.log('📥 Respuesta recibida:', response.status);
+                    
+                    if (!response.ok) {
+                        throw new Error(`Error HTTP: ${response.status}`);
+                    }
+                    
+                    // Verificar si es un archivo ZIP
+                    const contentType = response.headers.get('content-type');
+                    console.log('📦 Content-Type:', contentType);
+                    
+                    if (contentType && contentType.includes('application/zip')) {
+                        return response.blob();
+                    } else {
+                        // Si no es un archivo, podría ser un redirect o error
+                        return response.text().then(text => {
+                            console.log('📄 Respuesta texto:', text.substring(0, 200));
+                            throw new Error('Respuesta inesperada del servidor');
+                        });
+                    }
+                })
+                .then(blob => {
+                    console.log('📦 Blob recibido, tamaño:', blob.size);
+                    
+                    // Crear enlace de descarga
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    
+                    // Generar nombre de archivo con timestamp
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                    a.download = `InertiaX_Reporte_${timestamp}.zip`;
+                    
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    // Limpiar
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    
+                    // Mostrar mensaje de éxito
+                    showNotification('✅ Reporte generado exitosamente', 'success');
+                })
+                .catch(error => {
+                    console.error('❌ Error generando reporte:', error);
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    
+                    // Mostrar error específico
+                    let errorMessage = 'Error generando reporte';
+                    if (error.message.includes('Failed to fetch')) {
+                        errorMessage = 'Error de conexión con el servidor';
+                    } else if (error.message.includes('HTTP')) {
+                        errorMessage = 'Error del servidor al procesar la solicitud';
+                    }
+                    
+                    showNotification(`❌ ${errorMessage}`, 'error');
+                });
+        }
+
+        // Función para mostrar notificaciones
+        function showNotification(message, type = 'info') {
+            // Crear elemento de notificación
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type === 'error' ? 'danger' : 'success'} alert-dismissible fade show`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 10000;
+                min-width: 300px;
+                backdrop-filter: blur(10px);
+            `;
+            
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : 'check-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remover después de 5 segundos
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
         // Iniciar pago
         function initiatePayment() {
             showLoading();
             
-            fetch('/create_preference', { method: 'POST' })
-            .then(response => response.json())
+            console.log('💳 Iniciando proceso de pago...');
+            
+            fetch('/create_preference', { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(preference => {
                 document.getElementById('loadingOverlay').style.display = 'none';
-                if (preference.init_point) {
-                    window.location.href = preference.init_point;
+                console.log('✅ Preferencia de pago creada:', preference);
+                
+                if (preference.init_point || preference.sandbox_init_point) {
+                    const paymentUrl = preference.init_point || preference.sandbox_init_point;
+                    window.location.href = paymentUrl;
+                } else if (preference.error) {
+                    throw new Error(preference.error);
                 } else {
-                    alert('❌ Error al iniciar el pago');
+                    throw new Error('No se pudo obtener URL de pago');
                 }
             })
             .catch(error => {
+                console.error('❌ Error en pago:', error);
                 document.getElementById('loadingOverlay').style.display = 'none';
-                alert('❌ Error: ' + error.message);
+                showNotification('❌ Error al procesar el pago', 'error');
             });
         }
 
