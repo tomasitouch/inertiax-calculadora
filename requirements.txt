@@ -1,14 +1,32 @@
-flask
+# ==============================
+# INERTIAX ENTERPRISE - PRODUCTION
+# ==============================
+
+# 🚀 CORE FRAMEWORK
+Flask
 flask-cors
+gunicorn
+Werkzeug
+
+# 📊 DATA SCIENCE STACK
 pandas
+numpy
 openpyxl
+scipy
+scikit-learn
+
+# 🎨 VISUALIZATION & REPORTS
 matplotlib
 seaborn
+Pillow
 reportlab
 python-docx
-mercadopago
-requests
-pillow
+
+# 🤖 AI & APIS
 openai
-gunicorn
-scipy
+requests
+mercadopago
+
+# 🛠️ UTILITIES
+python-dateutil
+pytz
