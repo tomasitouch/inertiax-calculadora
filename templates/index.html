@@ -49,6 +49,10 @@
             width: 3rem;
             height: 3rem;
         }
+        .table-responsive {
+            max-height: 500px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -110,13 +114,12 @@
                                 <div class="col-md-6">
                                     <label for="nombre_entrenador" class="form-label">Nombre del Entrenador *</label>
                                     <input type="text" class="form-control" id="nombre_entrenador" name="nombre_entrenador" 
-                                           value="{{ form_data.nombre_entrenador if form_data }}" required>
+                                           value="{{ form_data.nombre_entrenador if form_data else '' }}" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="origen_app" class="form-label">Origen del Archivo</label>
                                     <select class="form-select" id="origen_app" name="origen_app" required>
-                                        <option value="app_android_encoder_vertical" 
-                                                {% if form_data and form_data.origen_app == 'app_android_encoder_vertical' %}selected{% endif %}>
+                                        <option value="app_android_encoder_vertical" selected>
                                             Encoder Vertical Android
                                         </option>
                                     </select>
@@ -128,7 +131,8 @@
                                 <div class="col-12">
                                     <label for="codigo_invitado" class="form-label">Código de Invitado (opcional)</label>
                                     <input type="text" class="form-control" id="codigo_invitado" name="codigo_invitado" 
-                                           placeholder="Si tienes un código de acceso, ingrésalo aquí">
+                                           placeholder="Si tienes un código de acceso, ingrésalo aquí"
+                                           value="{{ form_data.codigo_invitado if form_data else '' }}">
                                 </div>
                             </div>
 
@@ -166,7 +170,7 @@
                         <span class="badge bg-success">{{ filename }}</span>
                     </div>
                     <div class="card-body">
-                        <div class="preview-table">
+                        <div class="table-responsive">
                             {{ table_html|safe }}
                         </div>
                         
@@ -256,6 +260,8 @@
 
         // Manejar envío del formulario
         document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            console.log('Formulario enviándose...');
+            
             // Validar campos requeridos
             const nombreEntrenador = document.getElementById('nombre_entrenador').value.trim();
             const archivo = document.getElementById('fileInput').files[0];
@@ -278,11 +284,13 @@
             document.getElementById('loadingSpinner').classList.remove('d-none');
             document.getElementById('submitButton').disabled = true;
             
-            // El formulario se enviará normalmente
+            console.log('Formulario válido, enviando...');
+            // El formulario se enviará normalmente al servidor
         });
 
         // Iniciar pago
         function initiatePayment() {
+            console.log('Iniciando proceso de pago...');
             document.getElementById('loadingOverlay').style.display = 'flex';
             
             fetch('/create_preference', {
@@ -293,7 +301,7 @@
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Error en la respuesta del servidor');
+                    throw new Error('Error en la respuesta del servidor: ' + response.status);
                 }
                 return response.json();
             })
@@ -306,6 +314,7 @@
                 }
                 
                 if (preference.init_point) {
+                    console.log('Redirigiendo a Mercado Pago...');
                     // Redirigir a Mercado Pago
                     window.location.href = preference.init_point;
                 } else {
@@ -388,6 +397,9 @@
         window.addEventListener('error', function(e) {
             console.error('Error capturado:', e.error);
         });
+
+        // Debug: verificar que el script se carga
+        console.log('Script de InertiaX cargado correctamente');
     </script>
 </body>
 </html>
