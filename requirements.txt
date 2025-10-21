@@ -1,13 +1,13 @@
 flask
+flask-cors
 pandas
 openpyxl
 matplotlib
 seaborn
 reportlab
 python-docx
-openai
 mercadopago
 requests
 pillow
-flask-cors
-
+openai
+gunicorn
