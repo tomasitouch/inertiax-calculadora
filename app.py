@@ -137,20 +137,48 @@ def _allowed_file(name: str) -> bool:
 # ==============================
 
 def parse_dataframe(path: str) -> pd.DataFrame:
-    ext = os.path.splitext(path)[1].lower()
-    if ext == ".csv":
-        return pd.read_csv(path)
-    return pd.read_excel(path)
+    try:
+        ext = os.path.splitext(path)[1].lower()
+        print(f"📖 LEYENDO ARCHIVO: {path} (extensión: {ext})")
+        
+        if ext == ".csv":
+            # Probar diferentes encodings
+            encodings = ['utf-8', 'latin-1', 'iso-8859-1', 'windows-1252']
+            for encoding in encodings:
+                try:
+                    df = pd.read_csv(path, encoding=encoding)
+                    print(f"✅ CSV LEÍDO CON ENCODING: {encoding}")
+                    return df
+                except UnicodeDecodeError:
+                    continue
+            # Si ninguno funciona, usar el default con error handling
+            return pd.read_csv(path, encoding='utf-8', errors='replace')
+        else:
+            return pd.read_excel(path)
+    except Exception as e:
+        print(f"❌ ERROR EN PARSE_DATAFRAME: {str(e)}")
+        raise
+
+
+
+
 
 def preprocess_data_by_origin(df: pd.DataFrame, origin: str) -> pd.DataFrame:
     """
     Ajusta el DataFrame según la app o dispositivo que generó el CSV.
     """
+    print(f"🔧 PROCESANDO DATOS PARA ORIGEN: {origin}")
     origin = origin.lower()
+    
     if origin == "app_android_encoder_vertical":
+        print("🎯 PROCESANDO ENCODER VERTICAL ANDROID")
+        
+        # Mostrar columnas originales para debug
+        print(f"📝 COLUMNAS ORIGINALES: {list(df.columns)}")
+        
         rename_map = {
             "Athlete": "atleta",
-            "Exercise": "ejercicio",
+            "Exercise": "ejercicio", 
             "Date": "fecha",
             "Repetition": "repeticion",
             "Load(kg)": "carga_kg",
@@ -160,33 +188,54 @@ def preprocess_data_by_origin(df: pd.DataFrame, origin: str) -> pd.DataFrame:
             "Duration(s)": "duracion_s",
             "Estimated1RM": "estimado_1rm_kg"
         }
-        df.rename(columns={c: rename_map.get(c, c) for c in df.columns}, inplace=True)
+        
+        # Aplicar renombrado solo para columnas que existen
+        existing_rename_map = {k: v for k, v in rename_map.items() if k in df.columns}
+        df.rename(columns=existing_rename_map, inplace=True)
+        
+        print(f"📝 COLUMNAS DESPUÉS DE RENOMBRAR: {list(df.columns)}")
 
+        # Procesar columnas numéricas
         num_cols = [
             "carga_kg", "velocidad_concentrica_m_s", "velocidad_eccentrica_m_s",
             "velocidad_maxima_m_s", "duracion_s", "estimado_1rm_kg"
         ]
+        
         for col in num_cols:
             if col in df.columns:
                 df[col] = pd.to_numeric(df[col], errors="coerce")
+                print(f"🔢 COLUMNA NUMÉRICA PROCESADA: {col}")
 
+        # Calcular potencia si tenemos las columnas necesarias
         if "velocidad_concentrica_m_s" in df.columns and "carga_kg" in df.columns:
             df["potencia_relativa_w_kg"] = df["carga_kg"] * df["velocidad_concentrica_m_s"]
+            print("⚡ POTENCIA CALCULADA")
 
+        # Procesar fecha
         if "fecha" in df.columns:
             df["fecha"] = pd.to_datetime(df["fecha"], errors="coerce")
+            print("📅 FECHA PROCESADA")
 
+        # Limpiar datos
         df.dropna(how="all", inplace=True)
-        return df
-
-    elif origin == "jump_sensor":
-        if "altura_cm" in df.columns:
-            df["altura_m"] = df["altura_cm"] / 100
+        print(f"🧹 DATOS LIMPIOS: {df.shape[0]} filas restantes")
+        
         return df
 
     else:
+        # Para otros orígenes, solo limpiar nombres de columnas
         df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
+        print(f"🔧 COLUMNAS ESTANDARIZADAS: {list(df.columns)}")
         return df
+
+
+
+
+
+
+
+
+
 
 # ==============================
 # ANÁLISIS ESPECÍFICO PARA ENCODER VERTICAL
@@ -794,6 +843,7 @@ def health():
 
 
 
+
 @app.route("/upload", methods=["POST"])
 def upload():
     """Subida de archivo y procesamiento inicial - INTERFAZ SIMPLIFICADA"""
@@ -808,7 +858,10 @@ def upload():
             "codigo_invitado": request.form.get("codigo_invitado", "").strip(),
         }
 
-        print(f"📥 Datos del formulario recibidos: {form}")
+        print(f"📥 DATOS DEL FORMULARIO RECIBIDOS:")
+        print(f"   - Nombre entrenador: {form['nombre_entrenador']}")
+        print(f"   - Origen app: {form['origen_app']}")
+        print(f"   - Código invitado: {form['codigo_invitado']}")
 
         # Verificar código de invitado
         code = form.get("codigo_invitado", "")
@@ -817,22 +870,27 @@ def upload():
         if code and code in app.config["GUEST_CODES"]:
             payment_ok = True
             mensaje = "🔓 Código de invitado válido. Puedes generar tu reporte."
+            print("✅ CÓDIGO DE INVITADO VÁLIDO")
 
         f = request.files.get("file")
-        print(f"📁 Archivo recibido: {f.filename if f else 'None'}")
+        print(f"📁 ARCHIVO RECIBIDO: {f.filename if f else 'NONE'}")
         
         if not f or f.filename == "":
+            print("❌ ERROR: No se subió ningún archivo")
             return render_template("index.html", error="No se subió ningún archivo.")
 
         if not _allowed_file(f.filename):
+            print(f"❌ ERROR: Formato no permitido - {f.filename}")
             return render_template("index.html", error="Formato no permitido. Usa .csv, .xls o .xlsx")
 
         # Guardar archivo
         ext = os.path.splitext(f.filename)[1].lower()
         safe_name = f"{uuid.uuid4().hex}{ext}"
         save_path = os.path.join(_job_dir(job_id), safe_name)
+        
+        print(f"💾 GUARDANDO ARCHIVO EN: {save_path}")
         f.save(save_path)
-        print(f"💾 Archivo guardado en: {save_path}")
+        print("✅ ARCHIVO GUARDADO EXITOSAMENTE")
 
         # Persistir meta
         meta = {
@@ -842,23 +900,26 @@ def upload():
             "form": form,
         }
         _save_meta(job_id, meta)
+        print("✅ METADATOS GUARDADOS")
 
         # Previsualización simple
         try:
+            print("🔄 PROCESANDO DATAFRAME...")
             df = parse_dataframe(save_path)
-            print(f"📊 DataFrame cargado: {df.shape[0]} filas, {df.shape[1]} columnas")
+            print(f"📊 DATAFRAME CARGADO: {df.shape[0]} filas, {df.shape[1]} columnas")
             
             df = preprocess_data_by_origin(df, form.get("origen_app", ""))
-            print(f"🔧 DataFrame procesado: {df.shape[0]} filas, {df.shape[1]} columnas")
+            print(f"🔧 DATAFRAME PROCESADO: {df.shape[0]} filas, {df.shape[1]} columnas")
+            print(f"📋 COLUMNAS: {list(df.columns)}")
             
             # Generar tabla HTML para previsualización
             table_html = df.head(10).to_html(
-                classes="table table-striped table-bordered", 
+                classes="table table-striped table-bordered table-hover", 
                 index=False,
                 escape=False
             )
             
-            print("✅ Previsualización generada exitosamente")
+            print("✅ PREVISUALIZACIÓN GENERADA EXITOSAMENTE")
             
             return render_template(
                 "index.html",
@@ -870,14 +931,20 @@ def upload():
             )
             
         except Exception as e:
-            print(f"❌ Error procesando archivo: {str(e)}")
-            log.exception("Error al procesar archivo")
+            print(f"❌ ERROR PROCESANDO ARCHIVO: {str(e)}")
+            import traceback
+            print(f"🔍 TRACEBACK: {traceback.format_exc()}")
+            log.exception("Error al procesar el archivo")
             return render_template("index.html", error=f"Error al procesar el archivo: {str(e)}")
             
     except Exception as e:
-        print(f"💥 Error general en upload: {str(e)}")
+        print(f"💥 ERROR GENERAL EN UPLOAD: {str(e)}")
+        import traceback
+        print(f"🔍 TRACEBACK: {traceback.format_exc()}")
         log.exception("Error general en upload")
         return render_template("index.html", error=f"Error en el servidor: {str(e)}")
+
+
 
 
 
