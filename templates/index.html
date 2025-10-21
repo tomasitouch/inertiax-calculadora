@@ -24,10 +24,6 @@
             border-color: #667eea;
             background: #e9ecef;
         }
-        .preview-table {
-            max-height: 400px;
-            overflow-y: auto;
-        }
         .feature-icon {
             font-size: 2rem;
             color: #667eea;
@@ -45,21 +41,13 @@
             align-items: center;
             z-index: 9999;
         }
-        .spinner-large {
-            width: 3rem;
-            height: 3rem;
-        }
-        .table-responsive {
-            max-height: 500px;
-            overflow-y: auto;
-        }
     </style>
 </head>
 <body>
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="text-center text-white">
-            <div class="spinner-border spinner-large" role="status">
+            <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
                 <span class="visually-hidden">Cargando...</span>
             </div>
             <p class="mt-2">Procesando archivo, por favor espere...</p>
@@ -73,7 +61,6 @@
                 <div class="col-lg-8">
                     <h1 class="display-4 fw-bold">InertiaX</h1>
                     <p class="lead">Análisis Profesional de Datos de Encoder Vertical</p>
-                    <p class="mb-0">Carga tus datos de encoder y obtén un análisis completo con gráficos y métricas avanzadas</p>
                 </div>
                 <div class="col-lg-4 text-center">
                     <div class="feature-icon">📊</div>
@@ -100,7 +87,7 @@
         </div>
         {% endif %}
 
-        <!-- Formulario Principal Simplificado -->
+        <!-- Formulario Principal -->
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="card shadow-sm">
@@ -108,8 +95,7 @@
                         <h4 class="mb-0">Cargar Datos de Encoder Vertical</h4>
                     </div>
                     <div class="card-body">
-                        <form id="uploadForm" method="post" enctype="multipart/form-data" action="/upload">
-                            <!-- Campos simplificados -->
+                        <form method="post" enctype="multipart/form-data" action="/upload" onsubmit="showLoading()">
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label for="nombre_entrenador" class="form-label">Nombre del Entrenador *</label>
@@ -126,33 +112,24 @@
                                 </div>
                             </div>
 
-                            <!-- Código de invitado -->
                             <div class="row mb-3">
                                 <div class="col-12">
                                     <label for="codigo_invitado" class="form-label">Código de Invitado (opcional)</label>
                                     <input type="text" class="form-control" id="codigo_invitado" name="codigo_invitado" 
-                                           placeholder="Si tienes un código de acceso, ingrésalo aquí"
-                                           value="{{ form_data.codigo_invitado if form_data else '' }}">
+                                           value="{{ form_data.codigo_invitado if form_data else '' }}"
+                                           placeholder="Si tienes un código de acceso, ingrésalo aquí">
                                 </div>
                             </div>
 
-                            <!-- Área de carga -->
                             <div class="mb-3">
                                 <label class="form-label">Subir Archivo de Datos *</label>
-                                <div class="upload-area" id="uploadArea">
-                                    <input type="file" class="form-control" name="file" id="fileInput" 
-                                           accept=".csv,.xls,.xlsx" required>
-                                    <div class="mt-2">
-                                        <small class="text-muted">Formatos aceptados: CSV, Excel (.xls, .xlsx)</small>
-                                    </div>
-                                </div>
+                                <input type="file" class="form-control" name="file" 
+                                       accept=".csv,.xls,.xlsx" required>
+                                <div class="form-text">Formatos aceptados: CSV, Excel (.xls, .xlsx). Máximo 20MB.</div>
                             </div>
 
-                            <button type="submit" class="btn btn-primary w-100 py-2" id="submitButton">
-                                <span id="submitText">Cargar y Previsualizar Datos</span>
-                                <div id="loadingSpinner" class="spinner-border spinner-border-sm d-none" role="status">
-                                    <span class="visually-hidden">Cargando...</span>
-                                </div>
+                            <button type="submit" class="btn btn-primary w-100 py-2">
+                                Cargar y Previsualizar Datos
                             </button>
                         </form>
                     </div>
@@ -174,7 +151,6 @@
                             {{ table_html|safe }}
                         </div>
                         
-                        <!-- Botones de acción -->
                         <div class="mt-3 d-flex gap-2 flex-wrap">
                             {% if show_payment %}
                             <button class="btn btn-success" onclick="initiatePayment()">
@@ -200,15 +176,12 @@
 
         <!-- Información de Características -->
         <div class="row mt-5">
-            <div class="col-12">
-                <h3 class="text-center mb-4">¿Qué incluye el análisis?</h3>
-            </div>
             <div class="col-md-3 mb-3">
                 <div class="card text-center h-100">
                     <div class="card-body">
                         <div class="feature-icon">👥</div>
                         <h5>Análisis por Atleta</h5>
-                        <p class="text-muted">Identificación individual de cada atleta y sus métricas</p>
+                        <p class="text-muted">Identificación individual de cada atleta</p>
                     </div>
                 </div>
             </div>
@@ -217,7 +190,7 @@
                     <div class="card-body">
                         <div class="feature-icon">📈</div>
                         <h5>Gráficos Avanzados</h5>
-                        <p class="text-muted">Perfiles fuerza-velocidad y evolución de métricas</p>
+                        <p class="text-muted">Perfiles fuerza-velocidad y métricas</p>
                     </div>
                 </div>
             </div>
@@ -226,7 +199,7 @@
                     <div class="card-body">
                         <div class="feature-icon">📊</div>
                         <h5>Métricas Clave</h5>
-                        <p class="text-muted">Velocidad, carga, potencia y 1RM estimado</p>
+                        <p class="text-muted">Velocidad, carga, potencia y 1RM</p>
                     </div>
                 </div>
             </div>
@@ -235,14 +208,13 @@
                     <div class="card-body">
                         <div class="feature-icon">🎯</div>
                         <h5>Recomendaciones</h5>
-                        <p class="text-muted">Análisis IA profesional con recomendaciones específicas</p>
+                        <p class="text-muted">Análisis IA profesional específico</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
     <footer class="bg-dark text-white mt-5 py-4">
         <div class="container text-center">
             <p class="mb-0">InertiaX - Sistema de Análisis Deportivo &copy; 2024</p>
@@ -253,153 +225,32 @@
     <script src="https://sdk.mercadopago.com/js/v2"></script>
     
     <script>
-        // Configuración de Mercado Pago
-        const mp = new MercadoPago('{{ config.MP_PUBLIC_KEY }}', {
-            locale: 'es-CL'
-        });
+        // Configuración simple de Mercado Pago
+        const mp = new MercadoPago('{{ config.MP_PUBLIC_KEY }}', { locale: 'es-CL' });
 
-        // Manejar envío del formulario
-        document.getElementById('uploadForm').addEventListener('submit', function(e) {
-            console.log('Formulario enviándose...');
-            
-            // Validar campos requeridos
-            const nombreEntrenador = document.getElementById('nombre_entrenador').value.trim();
-            const archivo = document.getElementById('fileInput').files[0];
-            
-            if (!nombreEntrenador) {
-                e.preventDefault();
-                alert('Por favor ingresa tu nombre como entrenador');
-                return;
-            }
-            
-            if (!archivo) {
-                e.preventDefault();
-                alert('Por favor selecciona un archivo para subir');
-                return;
-            }
-            
-            // Mostrar loading
+        function showLoading() {
             document.getElementById('loadingOverlay').style.display = 'flex';
-            document.getElementById('submitText').textContent = 'Procesando...';
-            document.getElementById('loadingSpinner').classList.remove('d-none');
-            document.getElementById('submitButton').disabled = true;
-            
-            console.log('Formulario válido, enviando...');
-            // El formulario se enviará normalmente al servidor
-        });
+            return true; // Permite que el formulario se envíe
+        }
 
-        // Iniciar pago
         function initiatePayment() {
-            console.log('Iniciando proceso de pago...');
             document.getElementById('loadingOverlay').style.display = 'flex';
             
-            fetch('/create_preference', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error en la respuesta del servidor: ' + response.status);
-                }
-                return response.json();
-            })
+            fetch('/create_preference', { method: 'POST' })
+            .then(response => response.json())
             .then(preference => {
                 document.getElementById('loadingOverlay').style.display = 'none';
-                
-                if (preference.error) {
-                    alert('Error: ' + preference.error);
-                    return;
-                }
-                
                 if (preference.init_point) {
-                    console.log('Redirigiendo a Mercado Pago...');
-                    // Redirigir a Mercado Pago
                     window.location.href = preference.init_point;
                 } else {
-                    alert('Error: No se pudo obtener el enlace de pago');
+                    alert('Error: No se pudo iniciar el pago');
                 }
             })
             .catch(error => {
                 document.getElementById('loadingOverlay').style.display = 'none';
-                console.error('Error:', error);
-                alert('Error al procesar el pago: ' + error.message);
+                alert('Error: ' + error.message);
             });
         }
-
-        // Mejorar la experiencia de carga de archivos
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const fileName = file.name;
-                const fileSize = (file.size / (1024 * 1024)).toFixed(2);
-                
-                // Validar tipo de archivo
-                const allowedExtensions = ['.csv', '.xls', '.xlsx'];
-                const fileExtension = fileName.toLowerCase().substring(fileName.lastIndexOf('.'));
-                
-                if (!allowedExtensions.includes(fileExtension)) {
-                    alert('Formato de archivo no permitido. Use: .csv, .xls, .xlsx');
-                    this.value = '';
-                    return;
-                }
-                
-                // Validar tamaño (max 20MB)
-                if (file.size > 20 * 1024 * 1024) {
-                    alert('El archivo es demasiado grande. Máximo 20MB');
-                    this.value = '';
-                    return;
-                }
-                
-                document.getElementById('uploadArea').innerHTML = `
-                    <div class="text-success">
-                        <strong>✓ Archivo seleccionado:</strong> ${fileName}<br>
-                        <small>Tamaño: ${fileSize} MB</small>
-                    </div>
-                    <input type="file" class="form-control d-none" name="file" id="fileInput" 
-                           accept=".csv,.xls,.xlsx" required>
-                    <button type="button" class="btn btn-sm btn-outline-secondary mt-2" 
-                            onclick="resetFileInput()">Cambiar archivo</button>
-                `;
-            }
-        });
-
-        function resetFileInput() {
-            document.getElementById('uploadArea').innerHTML = `
-                <input type="file" class="form-control" name="file" id="fileInput" 
-                       accept=".csv,.xls,.xlsx" required>
-                <div class="mt-2">
-                    <small class="text-muted">Formatos aceptados: CSV, Excel (.xls, .xlsx)</small>
-                </div>
-            `;
-            // Re-attach event listener
-            document.getElementById('fileInput').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const fileName = file.name;
-                    const fileSize = (file.size / (1024 * 1024)).toFixed(2);
-                    document.getElementById('uploadArea').innerHTML = `
-                        <div class="text-success">
-                            <strong>✓ Archivo seleccionado:</strong> ${fileName}<br>
-                            <small>Tamaño: ${fileSize} MB</small>
-                        </div>
-                        <input type="file" class="form-control d-none" name="file" id="fileInput" 
-                               accept=".csv,.xls,.xlsx" required>
-                        <button type="button" class="btn btn-sm btn-outline-secondary mt-2" 
-                                onclick="resetFileInput()">Cambiar archivo</button>
-                    `;
-                }
-            });
-        }
-
-        // Mostrar mensaje si hay errores en la consola
-        window.addEventListener('error', function(e) {
-            console.error('Error capturado:', e.error);
-        });
-
-        // Debug: verificar que el script se carga
-        console.log('Script de InertiaX cargado correctamente');
     </script>
 </body>
 </html>
