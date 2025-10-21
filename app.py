@@ -792,63 +792,81 @@ def index():
 def health():
     return jsonify({"status": "ok", "message": "InertiaX API is running"})
 
+
+
 @app.route("/upload", methods=["POST"])
 def upload():
     """Subida de archivo y procesamiento inicial - INTERFAZ SIMPLIFICADA"""
-    job_id = _ensure_job()
-    session.modified = True
-
-    # Formulario simplificado
-    form = {
-        "nombre_entrenador": request.form.get("nombre_entrenador", "").strip(),
-        "origen_app": request.form.get("origen_app", "").strip(),
-    }
-
-    # Verificar código de invitado
-    code = request.form.get("codigo_invitado", "").strip()
-    payment_ok = False
-    mensaje = None
-    if code and code in app.config["GUEST_CODES"]:
-        payment_ok = True
-        mensaje = "🔓 Código de invitado válido. Puedes generar tu reporte."
-
-    f = request.files.get("file")
-    if not f or f.filename == "":
-        return render_template("index.html", error="No se subió ningún archivo.")
-
-    if not _allowed_file(f.filename):
-        return render_template("index.html", error="Formato no permitido. Usa .csv, .xls o .xlsx")
-
-    ext = os.path.splitext(f.filename)[1].lower()
-    safe_name = f"{uuid.uuid4().hex}{ext}"
-    save_path = os.path.join(_job_dir(job_id), safe_name)
-    f.save(save_path)
-
-    # Persistir meta
-    meta = {
-        "file_name": f.filename,
-        "file_path": save_path,
-        "payment_ok": payment_ok,
-        "form": form,
-    }
-    _save_meta(job_id, meta)
-
-    # Previsualización simple
     try:
-        df = parse_dataframe(save_path)
-        df = preprocess_data_by_origin(df, form.get("origen_app", ""))
-        table_html = df.head(10).to_html(classes="table table-striped table-hover", index=False)
-        return render_template(
-            "index.html",
-            table_html=table_html,
-            filename=f.filename,
-            form_data=form,
-            mensaje=mensaje,
-            show_payment=(not payment_ok),
-        )
+        job_id = _ensure_job()
+        session.modified = True
+
+        # Formulario simplificado
+        form = {
+            "nombre_entrenador": request.form.get("nombre_entrenador", "").strip(),
+            "origen_app": request.form.get("origen_app", "").strip(),
+            "codigo_invitado": request.form.get("codigo_invitado", "").strip(),
+        }
+
+        # Verificar código de invitado
+        code = form.get("codigo_invitado", "").strip()
+        payment_ok = False
+        mensaje = None
+        if code and code in app.config["GUEST_CODES"]:
+            payment_ok = True
+            mensaje = "🔓 Código de invitado válido. Puedes generar tu reporte."
+
+        f = request.files.get("file")
+        if not f or f.filename == "":
+            return render_template("index.html", error="No se subió ningún archivo.")
+
+        if not _allowed_file(f.filename):
+            return render_template("index.html", error="Formato no permitido. Usa .csv, .xls o .xlsx")
+
+        ext = os.path.splitext(f.filename)[1].lower()
+        safe_name = f"{uuid.uuid4().hex}{ext}"
+        save_path = os.path.join(_job_dir(job_id), safe_name)
+        f.save(save_path)
+
+        # Persistir meta
+        meta = {
+            "file_name": f.filename,
+            "file_path": save_path,
+            "payment_ok": payment_ok,
+            "form": form,
+        }
+        _save_meta(job_id, meta)
+
+        # Previsualización simple
+        try:
+            df = parse_dataframe(save_path)
+            df = preprocess_data_by_origin(df, form.get("origen_app", ""))
+            
+            # Generar tabla HTML para previsualización
+            table_html = df.head(10).to_html(
+                classes="table table-striped table-bordered table-hover", 
+                index=False,
+                escape=False
+            )
+            
+            return render_template(
+                "index.html",
+                table_html=table_html,
+                filename=f.filename,
+                form_data=form,
+                mensaje=mensaje,
+                show_payment=(not payment_ok),
+            )
+        except Exception as e:
+            log.exception("Error al procesar archivo")
+            return render_template("index.html", error=f"Error al procesar el archivo: {str(e)}")
+            
     except Exception as e:
-        log.exception("Error al procesar archivo")
-        return render_template("index.html", error=f"Error al procesar el archivo: {e}")
+        log.exception("Error general en upload")
+        return render_template("index.html", error=f"Error en el servidor: {str(e)}")
+
+
+
 
 @app.route("/create_preference", methods=["POST"])
 def create_preference():
