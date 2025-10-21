@@ -897,7 +897,7 @@ def create_preference():
     form = meta.get("form", {})
 
     # Precio fijo simplificado
-    price = 4900  # Precio único para análisis encoder vertical
+    price = 990  # Precio único para análisis encoder vertical
 
     pref_data = {
         "items": [{
