@@ -1436,7 +1436,7 @@ def create_preference():
         return jsonify(error="SESIÓN INVÁLIDA"), 400
 
     # Precio enterprise por servicio premium universal
-    price = 14900  # Servicio enterprise premium
+    price = 1000  # Servicio enterprise premium
 
     pref_data = {
         "items": [{
