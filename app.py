@@ -1684,39 +1684,52 @@ def upload():
 
 @app.route("/create_preference", methods=["POST"])
 def create_preference():
-    """Sistema de pago enterprise"""
-    if not mp:
+    """Sistema de pago enterprise - corregido con autenticación explícita"""
+    access_token = app.config.get("MP_ACCESS_TOKEN")
+    if not access_token:
+        log.error("❌ MP_ACCESS_TOKEN ausente o no cargado")
         return jsonify(error="SISTEMA DE PAGO NO CONFIGURADO"), 500
+
+    # Reinicializar SDK dentro de la función (garantiza autenticación válida)
+    mp = mercadopago.SDK(access_token)
 
     job_id = session.get("job_id")
     if not job_id:
         return jsonify(error="SESIÓN INVÁLIDA"), 400
 
-    # Precio enterprise por servicio premium universal
-    price = 1000
+    price = 1000  # CLP
 
     pref_data = {
         "items": [{
             "title": "InertiaX Enterprise - Análisis Universal Premium Completo",
-            "description": "Análisis biomecánico universal completo con IA científica para todos los dispositivos - Procesamiento con todos los datos",
+            "description": "Análisis biomecánico universal completo con IA científica para todos los dispositivos",
             "quantity": 1,
             "unit_price": price,
             "currency_id": "CLP",
         }],
         "back_urls": {
             "success": f"{app.config['DOMAIN_URL']}/success",
-            "failure": f"{app.config['DOMAIN_URL']}/cancel", 
+            "failure": f"{app.config['DOMAIN_URL']}/cancel",
             "pending": f"{app.config['DOMAIN_URL']}/cancel",
         },
         "auto_return": "approved",
     }
 
     try:
+        log.info("💳 Creando preferencia de pago en MercadoPago...")
         pref = mp.preference().create(pref_data)
+
+        if "error" in pref:
+            log.error(f"❌ Error al crear preferencia: {pref}")
+            return jsonify(error="Error al crear preferencia de pago"), 500
+
         return jsonify(pref.get("response", {}))
     except Exception as e:
-        log.error(f"Error en sistema de pago enterprise: {e}")
+        log.error(f"❌ Error en sistema de pago enterprise: {e}")
         return jsonify(error=str(e)), 500
+
+
+
 
 @app.route("/success")
 def success():
