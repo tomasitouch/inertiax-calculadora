@@ -1343,6 +1343,10 @@ def health():
         "timestamp": datetime.now().isoformat()
     })
 
+
+
+
+
 @app.route("/upload", methods=["POST"])
 def upload():
     """Endpoint enterprise universal para carga de datos"""
@@ -1390,7 +1394,7 @@ def upload():
         }
         _save_meta(job_id, meta)
 
-        # Previsualización enterprise
+        # Previsualización enterprise - CORREGIDO
         try:
             df = parse_dataframe(save_path)
             device_profile = detect_device_profile(df, form.get("origen_app", ""))
@@ -1418,12 +1422,19 @@ def upload():
             )
             
         except Exception as e:
-            log.error(f"❌ Error en procesamiento: {str(e)}")
+            log.error(f"❌ Error en procesamiento: {str(e)}")  # CORREGIDO: str(e) en lugar de e
+            import traceback
+            log.error(f"🔍 Traceback completo: {traceback.format_exc()}")  # Para debugging detallado
             return render_template("index.html", error=f"❌ ERROR EN PROCESAMIENTO: {str(e)}")
             
     except Exception as e:
         log.error(f"💥 Error general en upload: {str(e)}")
+        import traceback
+        log.error(f"🔍 Traceback completo: {traceback.format_exc()}")
         return render_template("index.html", error=f"❌ ERROR DEL SISTEMA: {str(e)}")
+
+
+
 
 @app.route("/create_preference", methods=["POST"])
 def create_preference():
