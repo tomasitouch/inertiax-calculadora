@@ -139,7 +139,7 @@ log = logging.getLogger("inertiax_enterprise")
 
 # Clientes enterprise
 mp = mercadopago.SDK(app.config["MP_ACCESS_TOKEN"]) if app.config["MP_ACCESS_TOKEN"] else None
-ai_client = OpenAI(api_key=app.config["OPENAI_API_KEY"]) if app.config["OPENAI_API_KEY"] else None
+#ai_client = OpenAI(api_key=app.config["OPENAI_API_KEY"]) if app.config["OPENAI_API_KEY"] else None
 
 # ==============================
 # MODELOS DE DATOS ENTERPRISE
@@ -1000,123 +1000,60 @@ def generate_session_report(df: pd.DataFrame, device_profile: str) -> str:
     
     return "\n".join(report_lines)
 
+
+
+
 def perform_interpretive_analysis(df: pd.DataFrame, device_profile: str) -> str:
-    """💬 5. Análisis interpretativo universal (IA explicativa) - COMPLETO"""
-    
-    if not ai_client:
-        return "🔍 ANÁLISIS INTERPRETATIVO NO DISPONIBLE - Configure OPENAI_API_KEY"
-    
+    """💬 5. Análisis interpretativo universal (IA explicativa) - FIX Render"""
+
+    import os
+    from openai import OpenAI
+
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key or not api_key.strip():
+        return "❌ No se detectó la variable OPENAI_API_KEY en el entorno Render."
+
     try:
-        # Preparar resumen COMPLETO de datos para IA
+        ai_client = OpenAI(api_key=api_key)  # Inicialización directa
+    except Exception as e:
+        return f"❌ Error al inicializar OpenAI: {e}"
+
+    try:
+        # Preparar resumen breve
         load_col = 'load' if 'load' in df.columns else 'carga_kg'
         max_vel_col = 'max_velocity' if 'max_velocity' in df.columns else 'velocidad_maxima_m_s'
-        avg_vel_col = 'avg_velocity' if 'avg_velocity' in df.columns else 'velocidad_concentrica_m_s'
-        user_col = 'user' if 'user' in df.columns else 'atleta'
-        exercise_col = 'exercise' if 'exercise' in df.columns else 'ejercicio'
-        
-        # Análisis estadístico completo para IA
-        stats_summary = ""
-        if load_col in df.columns:
-            stats_summary += f"""
-            - Carga: μ={df[load_col].mean():.1f}kg ± {df[load_col].std():.1f}kg (range: {df[load_col].min():.1f}-{df[load_col].max():.1f}kg)
-            - Volumen total: {df[load_col].sum():.0f}kg
-            """
-        
-        if avg_vel_col in df.columns:
-            stats_summary += f"""
-            - Velocidad: μ={df[avg_vel_col].mean():.3f}m/s ± {df[avg_vel_col].std():.3f}m/s
-            - CV: {(df[avg_vel_col].std() / df[avg_vel_col].mean() * 100) if df[avg_vel_col].mean() > 0 else 0:.1f}%
-            """
         
         data_summary = f"""
-        ANÁLISIS COMPLETO DE DATOS DE ENTRENAMIENTO - INFORMACIÓN PARA ENTRENADOR EXPERTO:
-        
-        CONTEXTO GENERAL:
+        RESUMEN EJECUTIVO:
         - Dispositivo: {app.config["DEVICE_PROFILES"][device_profile]["name"]}
-        - Total de registros: {len(df):,}
-        - Usuarios/Atletas: {df[user_col].nunique() if user_col in df.columns else 'Individual'}
-        - Ejercicios: {df[exercise_col].nunique() if exercise_col in df.columns else 'No especificados'}
-        
-        ESTADÍSTICAS CLAVE COMPLETAS:
-        {stats_summary}
-        
-        DISTRIBUCIÓN POR USUARIO:
+        - Repeticiones: {len(df)}
+        - Carga promedio: {df[load_col].mean() if load_col in df.columns else 'N/A':.1f} kg
+        - Velocidad promedio: {df[max_vel_col].mean() if max_vel_col in df.columns else 'N/A':.3f} m/s
         """
-        
-        # Análisis por usuario para IA
-        if user_col in df.columns:
-            for user in df[user_col].unique():
-                user_data = df[df[user_col] == user]
-                data_summary += f"""
-        - {user}: {len(user_data)} reps, Carga: {user_data[load_col].mean() if load_col in user_data.columns else 'N/A':.1f}kg, Vel: {user_data[avg_vel_col].mean() if avg_vel_col in user_data.columns else 'N/A':.3f}m/s
-                """
-        
-        data_summary += f"""
-        MUESTRA DE DATOS COMPLETA (primeras 10 repeticiones):
-        {df.head(10).to_string()}
-        """
-        
+
         prompt = f"""
-        Eres un entrenador deportivo de élite con 20+ años de experiencia en alto rendimiento, biomecánica y fisiología del ejercicio. 
-        Tienes expertise en periodización, control de carga y optimización del rendimiento.
-
-        ANALISIS COMPLETO SOLICITADO:
-
+        Actúa como un entrenador profesional y resume los hallazgos clave de este entrenamiento:
         {data_summary}
-
-        PROPORCIONA UN ANÁLISIS EXHAUSTIVO QUE INCLUYA:
-
-        1. EVALUACIÓN INTEGRAL DEL ENTRENAMIENTO:
-           - Análisis de la relación carga-velocidad y su significado fisiológico
-           - Identificación de puntos óptimos de potencia y eficiencia
-           - Evaluación de la dosificación de carga y volumen
-
-        2. ANÁLISIS INDIVIDUALIZADO POR ATLETA:
-           - Perfiles de fuerza-velocidad individuales
-           - Capacidad de recuperación y tolerancia a la carga
-           - Identificación de fortalezas y áreas de mejora
-
-        3. DIAGNÓSTICO DE FATIGA Y RECUPERACIÓN:
-           - Análisis de fatiga neuromuscular intra-sesión
-           - Patrones de decremento de velocidad
-           - Estrategias de gestión de fatiga
-
-        4. RECOMENDACIONES ESPECÍFICAS Y ACCIONABLES:
-           - Ajustes de carga basados en velocidades observadas
-           - Estrategias de periodización inmediatas
-           - Modificaciones técnicas basadas en consistencia
-           - Control de volumen e intensidad
-
-        5. PLANIFICACIÓN DE PRÓXIMAS SESIONES:
-           - Progresiones de carga específicas
-           - Estrategias de variación de ejercicios
-           - Control y monitoreo recomendado
-
-        6. DETECCIÓN DE RIESGOS Y OPORTUNIDADES:
-           - Señales de sobreentrenamiento o subentrenamiento
-           - Oportunidades de mejora técnica
-           - Optimización del potencial de rendimiento
-
-        Usa un lenguaje técnico pero práctico, basado en evidencia científica. 
-        Sé específico con métricas, porcentajes y recomendaciones concretas.
-        Incluye fundamentación fisiológica para cada recomendación.
         """
-        
+
         response = ai_client.chat.completions.create(
-            model=app.config["OPENAI_MODEL"],
+            model=os.getenv("OPENAI_MODEL", "gpt-4o"),
             messages=[
-                {"role": "system", "content": "Eres un entrenador de élite con expertise científico. Tu análisis es exhaustivo, basado en datos y orientado a la maximización del rendimiento. Combina ciencia del deporte con experiencia práctica."},
+                {"role": "system", "content": "Eres un entrenador conciso y práctico."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.7,
-            max_tokens=4000,  # Respuesta completa y exhaustiva
-            timeout=60  # Timeout suficiente para análisis completo
+            max_tokens=400,
+            temperature=0.7
         )
-        
-        return f"💬 ANÁLISIS INTERPRETATIVO COMPLETO - PERSPECTIVA DE ENTRENADOR DE ÉLITE\n\n{response.choices[0].message.content}"
-        
+
+        return f"💬 ANÁLISIS INTERPRETATIVO\n\n{response.choices[0].message.content}"
+
     except Exception as e:
-        return f"❌ Error en análisis interpretativo completo: {str(e)}"
+        return f"⚠️ Error durante análisis IA: {str(e)}"
+
+
+
+
 
 def perform_advanced_biomechanical_analysis(df: pd.DataFrame) -> str:
     """🔬 6. Análisis biomecánico avanzado universal - COMPLETO"""
