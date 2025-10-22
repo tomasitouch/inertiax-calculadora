@@ -48,47 +48,54 @@ warnings.filterwarnings('ignore')
 # CONFIGURACIÓN EMPRESARIAL PROFESIONAL
 # ==============================
 
+
+
+
+# ==============================
+# CONFIGURACIÓN ENTERPRISE PARAMETRIZADA (Render)
+# ==============================
+
 class Config:
-    # Seguridad empresarial
-    SECRET_KEY = os.getenv("SECRET_KEY", "inertiax_enterprise_pro_2025_secure_key")
+    # Seguridad Flask
+    SECRET_KEY = os.getenv("SECRET_KEY", os.urandom(24).hex())
     MAX_CONTENT_LENGTH = int(os.getenv("MAX_CONTENT_LENGTH_MB", "100")) * 1024 * 1024
     SESSION_COOKIE_NAME = "inertiax_enterprise_session"
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
 
-    # Archivos empresariales
+    # Sistema de archivos temporal (Render usa /tmp)
     UPLOAD_DIR = os.getenv("UPLOAD_DIR", "/tmp/inertiax_enterprise")
     os.makedirs(UPLOAD_DIR, exist_ok=True)
     ALLOWED_EXT = {".csv", ".xls", ".xlsx", ".xlsm", ".json"}
 
-    # Integraciones enterprise
+    # Integraciones externas (todo parametrizado)
     DOMAIN_URL = os.getenv("DOMAIN_URL", "https://inertiax-enterprise.onrender.com")
-    MP_ACCESS_TOKEN = os.getenv("MP_ACCESS_TOKEN")
-    MP_PUBLIC_KEY = os.getenv("MP_PUBLIC_KEY")
-    
-    # AI Configuration - Modelos de última generación
-    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-    OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
+    MP_ACCESS_TOKEN = os.getenv("MP_ACCESS_TOKEN")         # MercadoPago token privado
+    MP_PUBLIC_KEY = os.getenv("MP_PUBLIC_KEY")             # MercadoPago clave pública
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")           # OpenAI key
+    OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")     # Modelo predeterminado
+    OPENROUTER_KEY = os.getenv("OPENROUTER_KEY")           # (opcional) si usas OpenRouter
 
-    # Sistema de acceso premium enterprise
+    # Códigos de invitado parametrizados
     GUEST_CODES = set(
-        (os.getenv("GUEST_CODES") or "INERTIAXENTERPRISE2025,COACH_PRO,V1WINDOWSPRO,ANDROIDPRO,PREMIUM2025").split(",")
+        (os.getenv("GUEST_CODES") or
+         "INERTIAXENTERPRISE2025,COACH_PRO,V1WINDOWSPRO,ANDROIDPRO,PREMIUM2025").split(",")
     )
 
-    # Configuraciones específicas por dispositivo
+    # Perfiles de dispositivos (no requiere variables externas)
     DEVICE_PROFILES = {
         "encoder_v1_windows": {
             "name": "Encoder V1 Windows",
             "columns": {
                 "user": "user", "exercise": "exercise", "type": "type",
-                "rep_number": "rep_number", "load": "load", 
+                "rep_number": "rep_number", "load": "load",
                 "max_velocity": "max_velocity", "avg_velocity": "avg_velocity",
                 "duration": "duration"
             },
             "analysis_focus": ["fuerza_velocidad", "fatiga_intra_serie", "consistencia_tecnica"]
         },
         "encoder_vertical_android": {
-            "name": "Encoder Vertical Android", 
+            "name": "Encoder Vertical Android",
             "columns": {
                 "Athlete": "atleta", "Exercise": "ejercicio", "Date": "fecha",
                 "Repetition": "repeticion", "Load(kg)": "carga_kg",
@@ -106,6 +113,7 @@ class Config:
             "analysis_focus": ["analisis_general", "patrones", "tendencias"]
         }
     }
+
 
 # ==============================
 # INICIALIZACIÓN ENTERPRISE
@@ -1878,7 +1886,25 @@ def global_error(e):
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "10000"))
-    log.info(f"🚀 INERTIAX ENTERPRISE UNIVERSAL COMPLETO INICIANDO EN PUERTO {port}")
-    log.info(f"📱 DISPOSITIVOS SOPORTADOS: {list(app.config['DEVICE_PROFILES'].keys())}")
-    log.info("💪 SISTEMA CONFIGURADO PARA PROCESAR TODOS LOS DATOS SIN SIMPLIFICACIONES")
-    app.run(host="0.0.0.0", port=port, debug=False)
+
+    log.info("🚀 INERTIAX ENTERPRISE UNIVERSAL COMPLETO - INICIO DE SERVIDOR")
+    log.info(f"🌍 Entorno: Render Cloud")
+    log.info(f"📦 Puerto activo: {port}")
+    log.info(f"📱 Dispositivos soportados: {list(app.config['DEVICE_PROFILES'].keys())}")
+    log.info("💪 Sistema configurado para procesar todos los datos sin simplificaciones")
+
+    # Diagnóstico de claves y modelos
+    log.info("🔐 Diagnóstico de configuración externa:")
+    log.info(f"   • MercadoPago Access Token: {'✅ OK' if app.config['MP_ACCESS_TOKEN'] else '❌ No configurado'}")
+    log.info(f"   • MercadoPago Public Key: {'✅ OK' if app.config['MP_PUBLIC_KEY'] else '❌ No configurado'}")
+    log.info(f"   • OpenAI API Key: {'✅ OK' if app.config['OPENAI_API_KEY'] else '❌ No configurado'}")
+    log.info(f"   • OpenAI Model: {app.config['OPENAI_MODEL']}")
+    log.info(f"   • OpenRouter Key: {'✅ OK' if app.config.get('OPENROUTER_KEY') else '❌ No configurado'}")
+    log.info(f"   • Dominio configurado: {app.config['DOMAIN_URL']}")
+    log.info(f"   • Directorio temporal: {app.config['UPLOAD_DIR']}")
+
+    try:
+        app.run(host="0.0.0.0", port=port, debug=False)
+    except Exception as e:
+        log.error(f"💥 Error crítico al iniciar el servidor: {e}")
+
