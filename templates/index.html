@@ -1018,17 +1018,81 @@
         // FUNCIONES ADICIONALES
         // ==============================
 
-        function initiatePayment() {
-            showLoading();
-            // Lógica de pago aquí
-            console.log('Iniciando proceso de pago...');
+
+
+// ==============================
+// FUNCIONES ADICIONALES CORREGIDAS Y FUNCIONALES
+// ==============================
+
+// 🔹 FUNCIÓN DE PAGO (MercadoPago)
+async function initiatePayment() {
+    showLoading();
+    console.log('💳 Iniciando proceso de pago...');
+
+    try {
+        const response = await fetch('/create_preference', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+        });
+
+        const data = await response.json();
+        hideLoading();
+
+        if (data.init_point) {
+            showNotification('✅ Redirigiendo a MercadoPago...', 'success');
+            window.location.href = data.init_point;
+        } else {
+            showNotification('❌ No se pudo iniciar el pago. Intenta nuevamente.', 'error');
+        }
+    } catch (error) {
+        console.error('Error en initiatePayment:', error);
+        hideLoading();
+        showNotification('❌ Error al conectar con el servidor de pago.', 'error');
+    }
+}
+
+
+// 🔹 FUNCIÓN PARA GENERAR Y DESCARGAR REPORTE
+async function generateReport() {
+    showLoading();
+    console.log('📊 Generando reporte completo...');
+
+    try {
+        const response = await fetch('/generate_report', {
+            method: 'GET',
+            credentials: 'include'  // mantiene la sesión Flask
+        });
+
+        if (!response.ok) {
+            hideLoading();
+            showNotification('❌ Error al generar el reporte (' + response.status + ')', 'error');
+            return;
         }
 
-        function generateReport() {
-            showLoading();
-            // Lógica para generar reporte
-            console.log('Generando reporte completo...');
-        }
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        // Descargar el archivo ZIP
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'InertiaX_Reporte_Universal.zip';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        hideLoading();
+        showNotification('✅ Reporte generado y descargado correctamente', 'success');
+    } catch (error) {
+        console.error('Error en generateReport:', error);
+        hideLoading();
+        showNotification('❌ Error al conectar con el servidor de reportes.', 'error');
+    }
+}
+
+
+
+        
     </script>
 </body>
 </html>
