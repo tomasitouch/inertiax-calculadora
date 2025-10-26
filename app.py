@@ -853,7 +853,7 @@ def health():
         "timestamp": datetime.now().isoformat()
     })
 
-@app.route("/upload", methods=["POST"])
+@app.route('/upload', methods=['GET', 'POST'])
 def upload():
     """Endpoint profesional para carga de datos"""
     try:
