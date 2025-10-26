@@ -394,6 +394,18 @@
             border-left: 4px solid #51cf66;
         }
 
+        .alert-info {
+            background: rgba(23, 162, 184, 0.1);
+            color: #66d9e8;
+            border-left: 4px solid #66d9e8;
+        }
+
+        .alert-warning {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffd43b;
+            border-left: 4px solid #ffd43b;
+        }
+
         footer {
             background: var(--darker-bg);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -428,6 +440,31 @@
             from, to { border-color: transparent }
             50% { border-color: var(--accent) }
         }
+
+        .analysis-section {
+            border-left: 4px solid var(--accent);
+            padding-left: 1rem;
+            margin: 1rem 0;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
@@ -446,7 +483,7 @@
         </div>
     </div>
 
-<!-- Navigation -->
+    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background: rgba(15, 15, 35, 0.95); backdrop-filter: blur(20px);">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#">
@@ -477,7 +514,6 @@
         </div>
     </nav>
 
-    
     <!-- Hero Section -->
     <section class="hero-section">
         <div class="floating-shapes">
@@ -494,7 +530,7 @@
                     </div>
                     <h1 class="hero-title">Potencia el Rendimiento Deportivo con <span class="typewriter">IA</span></h1>
                     <p class="hero-subtitle">
-                        Analiza datos de encoder vertical con inteligencia artificial. Obtén insights profundos, gráficos avanzados y recomendaciones personalizadas para cada atleta.
+                        Analiza datos de encoder horizontal y vertical con inteligencia artificial. Obtén insights profundos, gráficos avanzados y recomendaciones personalizadas para cada atleta.
                     </p>
                     <div class="d-flex flex-wrap gap-3">
                         <a href="#upload" class="btn btn-gradient">
@@ -583,7 +619,7 @@
                         <div class="row mb-4">
                             <div class="col-12 text-center">
                                 <h2 class="display-5 fw-bold mb-3">Analiza tus Datos</h2>
-                                <p class="hero-subtitle">Sube tu archivo del encoder vertical y obtén un análisis completo en segundos</p>
+                                <p class="hero-subtitle">Sube tu archivo del encoder y obtén un análisis completo en segundos</p>
                             </div>
                         </div>
 
@@ -613,11 +649,19 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Origen del Archivo</label>
-                                    <select class="form-select" name="origen_app" required>
-                                        <option value="app_android_encoder_vertical" selected>
-                                            📱 Encoder Vertical Android
-                                        </option>
+                                    <select class="form-select" name="origen_app" required id="origenAppSelect" onchange="toggleEncoderOptions()">
+                                        <option value="app_android_encoder_vertical">📱 Encoder Vertical Android</option>
+                                        <option value="encoder_horizontal" {% if form_data and form_data.origen_app == 'encoder_horizontal' %}selected{% endif %}>🏃 Encoder Horizontal</option>
                                     </select>
+                                </div>
+
+                                <!-- Opciones específicas para Encoder Horizontal -->
+                                <div id="encoderHorizontalOptions" style="display: {% if form_data and form_data.origen_app == 'encoder_horizontal' %}block{% else %}none{% endif %};" class="col-12">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-robot me-2"></i>
+                                        <strong>Detección Automática Activada</strong>
+                                        <p class="mb-0 mt-2">La IA detectará automáticamente el tipo de archivo (Velocidad, Aceleración, Distancia, Resumen) y realizará un análisis especializado.</p>
+                                    </div>
                                 </div>
 
                                 <div class="col-12">
@@ -631,15 +675,14 @@
                                     <label class="form-label">Archivo de Datos *</label>
                                     
                                     <!-- Input de archivo visible pero estilizado -->
-                                    <div class="upload-area" id="uploadArea">
+                                    <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
                                         <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-primary"></i>
                                         <h5>Arrastra tu archivo o haz click aquí</h5>
                                         <p class="text-secondary">Formatos: CSV, Excel (.xls, .xlsx)</p>
                                         
-                                        <!-- Input visible pero integrado visualmente -->
-                                        <input type="file" class="form-control mt-3" name="file" id="fileInput" 
-                                               accept=".csv,.xls,.xlsx" required onchange="handleFileSelect(this)"
-                                               style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white;">
+                                        <!-- Input oculto pero funcional -->
+                                        <input type="file" class="d-none" name="file" id="fileInput" 
+                                               accept=".csv,.xls,.xlsx" required onchange="handleFileSelect(this)">
                                     </div>
                                     <div id="fileInfo" class="mt-3"></div>
                                 </div>
@@ -670,21 +713,134 @@
                         <div class="table-responsive">
                             {{ table_html|safe }}
                         </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Análisis con IA para Encoder Horizontal -->
+            {% if encoder_analysis %}
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="glass-card">
+                        <h3 class="mb-4">
+                            <i class="fas fa-chart-bar me-2"></i>Análisis Profesional con IA - Encoder Horizontal
+                        </h3>
                         
-                        <div class="mt-4 d-flex flex-wrap gap-3 justify-content-center">
-                            {% if show_payment %}
-                            <button class="btn btn-success btn-lg" onclick="initiatePayment()">
-                                <i class="fas fa-credit-card me-2"></i>Generar Reporte Completo - $990 CLP
-                            </button>
-                            {% else %}
+                        <!-- Resumen del análisis -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="alert alert-info">
+                                    <h5><i class="fas fa-file-alt me-2"></i>{{ encoder_analysis.tipo_archivo|title }}</h5>
+                                    <p class="mb-0">{{ encoder_analysis.nombre_archivo }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-success">
+                                    <h5><i class="fas fa-clock me-2"></i>Timestamp</h5>
+                                    <p class="mb-0">{{ encoder_analysis.timestamp_analisis }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Métricas clave -->
+                        {% if encoder_analysis.metricas_clave %}
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5><i class="fas fa-tachometer-alt me-2"></i>Métricas Clave</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-dark">
+                                        <tbody>
+                                            {% for categoria, metricas in encoder_analysis.metricas_clave.items() %}
+                                            <tr>
+                                                <td colspan="2" class="fw-bold text-info">{{ categoria|title }}</td>
+                                            </tr>
+                                            {% for clave, valor in metricas.items() %}
+                                            <tr>
+                                                <td width="30%">{{ clave|replace('_', ' ')|title }}</td>
+                                                <td>
+                                                    {% if valor is number %}
+                                                        {{ "%.2f"|format(valor) }}
+                                                    {% else %}
+                                                        {{ valor }}
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Insights de IA -->
+                        {% if encoder_analysis.insights_ia %}
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5><i class="fas fa-brain me-2"></i>Insights de Inteligencia Artificial</h5>
+                                <div class="alert alert-warning">
+                                    {% for insight in encoder_analysis.insights_ia %}
+                                    <div class="mb-2">
+                                        <i class="fas fa-lightbulb me-2"></i>{{ insight }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Recomendaciones -->
+                        {% if encoder_analysis.recomendaciones %}
+                        <div class="row">
+                            <div class="col-12">
+                                <h5><i class="fas fa-clipboard-list me-2"></i>Recomendaciones de Entrenamiento</h5>
+                                <div class="alert alert-success">
+                                    {% for recomendacion in encoder_analysis.recomendaciones %}
+                                    <div class="mb-2">
+                                        <i class="fas fa-check-circle me-2"></i>{{ recomendacion }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Botones de acción -->
+                        <div class="row mt-4">
+                            <div class="col-12 text-center">
+                                <div class="d-flex flex-wrap gap-3 justify-content-center">
+                                    <a href="/generate_report" class="btn btn-success btn-lg">
+                                        <i class="fas fa-download me-2"></i>Descargar Reporte Completo
+                                    </a>
+                                    <a href="/preview_analysis" class="btn btn-outline-light btn-lg">
+                                        <i class="fas fa-eye me-2"></i>Vista Previa del Análisis
+                                    </a>
+                                    <a href="/clear_session" class="btn btn-outline-secondary btn-lg">
+                                        <i class="fas fa-redo me-2"></i>Nuevo Análisis
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Botones para otros tipos de archivos -->
+            {% if table_html and not encoder_analysis %}
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <div class="glass-card">
+                        <div class="d-flex flex-wrap gap-3 justify-content-center">
                             <a href="/generate_report" class="btn btn-success btn-lg">
                                 <i class="fas fa-download me-2"></i>Descargar Reporte Completo
                             </a>
                             <a href="/preview_analysis" class="btn btn-outline-light btn-lg">
                                 <i class="fas fa-eye me-2"></i>Vista Previa del Análisis
                             </a>
-                            {% endif %}
-                            <a href="/" class="btn btn-outline-secondary btn-lg">
+                            <a href="/clear_session" class="btn btn-outline-secondary btn-lg">
                                 <i class="fas fa-redo me-2"></i>Nuevo Análisis
                             </a>
                         </div>
@@ -718,136 +874,154 @@
         </div>
     </footer>
 
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://sdk.mercadopago.com/js/v2"></script>
-
-<script>
-    // Configuración de Mercado Pago
-    const mp = new MercadoPago('{{ config.MP_PUBLIC_KEY }}', { locale: 'es-CL' });
-
-    // Mostrar loading
-    function showLoading() {
-        document.getElementById('loadingOverlay').style.display = 'flex';
-        return true;
-    }
-function handleFileSelect(input) {
-    const file = input.files[0];
-
-    if (file) {
-        const fileName = file.name;
-        const fileSize = (file.size / (1024 * 1024)).toFixed(2);
-
-        // En vez de reemplazar el uploadArea
-        document.getElementById('fileInfo').innerHTML = `
-            <div class="text-success text-center">
-                <i class="fas fa-check-circle fa-2x mb-3"></i>
-                <h5>✅ Archivo listo para analizar</h5>
-                <p class="mb-1"><strong>${fileName}</strong></p>
-                <small class="text-secondary">Tamaño: ${fileSize} MB</small><br>
-                <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="resetFileInput()">
-                    <i class="fas fa-redo me-1"></i>Cambiar archivo
-                </button>
-            </div>
-        `;
-    }
-}
-
-
-    // Función para resetear el input de archivo
-function resetFileInput() {
-    document.getElementById('fileInput').value = "";
-    document.getElementById('fileInfo').innerHTML = "";
-}
-
-
-    // Drag and drop
-    const uploadArea = document.getElementById('uploadArea');
-
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        uploadArea.addEventListener(eventName, preventDefaults, false);
-    });
-
-    function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    ['dragenter', 'dragover'].forEach(eventName => {
-        uploadArea.addEventListener(eventName, () => uploadArea.classList.add('dragover'), false);
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-        uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('dragover'), false);
-    });
-
-    uploadArea.addEventListener('drop', handleDrop, false);
-
-    function handleDrop(e) {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        document.getElementById('fileInput').files = files;
-        handleFileSelect(document.getElementById('fileInput'));
-    }
-
-    // Iniciar pago
-    function initiatePayment() {
-        showLoading();
-
-        fetch('/create_preference', { method: 'POST' })
-            .then(response => response.json())
-            .then(preference => {
-                document.getElementById('loadingOverlay').style.display = 'none';
-                if (preference.init_point) {
-                    window.location.href = preference.init_point; // abrir checkout
-                } else {
-                    alert('❌ Error al iniciar el pago');
-                }
-            })
-            .catch(error => {
-                document.getElementById('loadingOverlay').style.display = 'none';
-                alert('❌ Error: ' + error.message);
-            });
-    }
-
-    // Smooth scroll
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            document.querySelector(this.getAttribute('href')).scrollIntoView({
-                behavior: 'smooth'
-            });
-        });
-    });
-
-    // Animación al hacer scroll
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Función para mostrar/ocultar opciones del Encoder Horizontal
+        function toggleEncoderOptions() {
+            const select = document.getElementById('origenAppSelect');
+            const optionsDiv = document.getElementById('encoderHorizontalOptions');
+            
+            if (select.value === 'encoder_horizontal') {
+                optionsDiv.style.display = 'block';
+            } else {
+                optionsDiv.style.display = 'none';
             }
+        }
+
+        // Mostrar loading
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            return true;
+        }
+
+        // Manejar selección de archivo
+        function handleFileSelect(input) {
+            const file = input.files[0];
+            
+            if (file) {
+                const fileName = file.name;
+                const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+                const origenApp = document.getElementById('origenAppSelect').value;
+
+                let detectedType = '';
+                if (origenApp === 'encoder_horizontal') {
+                    // Simular detección para Encoder Horizontal
+                    const fileNameLower = fileName.toLowerCase();
+                    
+                    if (fileNameLower.includes('velocidad') && fileNameLower.includes('distancia')) {
+                        detectedType = '📊 Velocidad vs Distancia';
+                    } else if (fileNameLower.includes('velocidad')) {
+                        detectedType = '🚀 Velocidad vs Tiempo';
+                    } else if (fileNameLower.includes('aceleracion') || fileNameLower.includes('aceleración')) {
+                        detectedType = '💥 Aceleración vs Tiempo';
+                    } else if (fileNameLower.includes('distancia')) {
+                        detectedType = '📏 Distancia vs Tiempo';
+                    } else if (fileNameLower.includes('resumen') || fileNameLower.includes('sprint_data')) {
+                        detectedType = '📈 Resumen de Métricas';
+                    } else {
+                        detectedType = '🔍 Archivo del Encoder Horizontal';
+                    }
+                    
+                    document.getElementById('fileInfo').innerHTML = `
+                        <div class="text-success text-center">
+                            <i class="fas fa-check-circle fa-2x mb-3"></i>
+                            <h5>✅ Archivo listo para análisis con IA</h5>
+                            <p class="mb-1"><strong>${fileName}</strong></p>
+                            <p class="mb-1"><strong>Tipo detectado:</strong> ${detectedType}</p>
+                            <small class="text-secondary">Tamaño: ${fileSize} MB</small><br>
+                            <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="resetFileInput()">
+                                <i class="fas fa-redo me-1"></i>Cambiar archivo
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    // Para Encoder Vertical
+                    document.getElementById('fileInfo').innerHTML = `
+                        <div class="text-success text-center">
+                            <i class="fas fa-check-circle fa-2x mb-3"></i>
+                            <h5>✅ Archivo listo para analizar</h5>
+                            <p class="mb-1"><strong>${fileName}</strong></p>
+                            <small class="text-secondary">Tamaño: ${fileSize} MB</small><br>
+                            <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="resetFileInput()">
+                                <i class="fas fa-redo me-1"></i>Cambiar archivo
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Función para resetear el input de archivo
+        function resetFileInput() {
+            document.getElementById('fileInput').value = "";
+            document.getElementById('fileInfo').innerHTML = "";
+        }
+
+        // Drag and drop
+        const uploadArea = document.getElementById('uploadArea');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
         });
-    }, observerOptions);
 
-    document.querySelectorAll('.glass-card').forEach(card => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(30px)';
-        card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        observer.observe(card);
-    });
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
 
-    console.log('🚀 InertiaX Platform Loaded');
-</script>
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.add('dragover'), false);
+        });
 
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('dragover'), false);
+        });
 
-    
+        uploadArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            document.getElementById('fileInput').files = files;
+            handleFileSelect(document.getElementById('fileInput'));
+        }
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Animación al hacer scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+
+        console.log('🚀 InertiaX Platform Loaded - Encoder Horizontal Support Active');
+    </script>
 </body>
 </html>
