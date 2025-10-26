@@ -102,41 +102,36 @@ def analyze_with_ai_and_charts(df: pd.DataFrame, nombre_entrenador: str, nombre_
         
         # Prompt optimizado para análisis deportivo + generación de gráficos
         system_prompt = """
-        Eres un especialista en análisis de datos deportivos (VBT - Velocity Based Training) 
-        y visualización de datos. Tu tarea es:
-
-        1. ANALIZAR los datos deportivos proporcionados
-        2. GENERAR código Python para crear gráficos profesionales
-        3. PROPORCIONAR un análisis completo en formato JSON
-
-        **INSTRUCCIONES PARA GRÁFICOS:**
-        - Genera código Python usando matplotlib/seaborn
-        - Los gráficos deben ser profesionales y claros
-        - Máximo 4 gráficos
-        - Incluir títulos, labels, y styling profesional
-        - Guardar cada gráfico en un BytesIO
-
-        **FORMATO DE RESPUESTA JSON:**
+        Eres un especialista en análisis de datos deportivos (VBT – Velocity Based Training),
+        biomecánica y fuerza-velocidad. Tu tarea es analizar a profundidad, explicando cada
+        patrón encontrado, sin resumir demasiado.
+        
+        ESTILO DE RESPUESTA:
+        - Explicación detallada (no resumes cortos)
+        - Describe patrones, tendencias, anomalías
+        - Interpreta repeticiones, fatiga, consistencia técnica
+        - Busca relaciones entre variables
+        - Escribe como si fueras un consultor experto explicándole a un entrenador
+        - Extiende donde sea necesario para maximizar valor al cliente
+        
+        NO RESUMIR. EVITAR RESPUESTAS CORTAS.
+        
+        FORMATO JSON (pero texto extenso dentro de cada campo):
+        
         {
-            "resumen_ejecutivo": "Resumen de 2-3 líneas",
-            "analisis_detallado": "Análisis completo por secciones",
-            "metricas_clave": {
-                "metric1": "valor y explicación",
-                "metric2": "valor y explicación"
-            },
-            "fortalezas": ["lista de fortalezas"],
-            "areas_mejora": ["lista de áreas a mejorar"],
-            "recomendaciones": [
-                {
-                    "categoria": "Fuerza/Potencia/etc",
-                    "accion": "Recomendación específica",
-                    "detalles": "Explicación técnica"
-                }
-            ],
-            "codigo_graficos": "código Python completo para generar gráficos",
-            "descripcion_graficos": "Descripción de qué muestra cada gráfico"
+            "analisis_general": "texto largo con análisis detallado",
+            "patrones_detectados": "texto largo con hallazgos",
+            "fatiga": "explicación larga",
+            "consistencia": "explicación larga",
+            "relacion_carga_velocidad": "explicación larga",
+            "curva_fuerza_velocidad": "explicación larga",
+            "distribucion_velocidades": "explicación larga",
+            "estimacion_1RM": "explicación larga",
+            "recomendaciones": "explicación detallada",
+            "codigo_graficos": "código Python completo"
         }
         """
+
 
         user_prompt = f"""
         **CONTEXTO:**
@@ -179,7 +174,7 @@ def analyze_with_ai_and_charts(df: pd.DataFrame, nombre_entrenador: str, nombre_
                 {"role": "user", "content": user_prompt},
             ],
             temperature=0.7,
-            max_tokens=8000,  # Más tokens para incluir código
+            max_tokens=12000,  # Más tokens para incluir código
             response_format={"type": "json_object"}
         )
         
