@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InertiaX | Análisis Deportivo con IA</title>
+    <title>InertiaX Pro | Análisis Deportivo con IA Multi-Formato</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -465,6 +465,33 @@
             color: var(--text-secondary);
             text-transform: uppercase;
         }
+
+        .detection-badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .confidence-bar {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
     </style>
 </head>
 <body>
@@ -493,7 +520,7 @@
                          height="35"
                          class="logo-img">
                 </div>
-                <span class="brand-text">InertiaX</span>
+                <span class="brand-text">InertiaX Pro</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -526,11 +553,11 @@
             <div class="row align-items-center min-vh-100">
                 <div class="col-lg-6">
                     <div class="feature-badge pulse">
-                        <i class="fas fa-rocket me-2"></i>PLATAFORMA AVANZADA
+                        <i class="fas fa-rocket me-2"></i>SISTEMA MULTI-FORMATO
                     </div>
-                    <h1 class="hero-title">Potencia el Rendimiento Deportivo con <span class="typewriter">IA</span></h1>
+                    <h1 class="hero-title">Análisis Deportivo con IA <span class="typewriter">Multi-Formato</span></h1>
                     <p class="hero-subtitle">
-                        Analiza datos de encoder horizontal y vertical con inteligencia artificial. Obtén insights profundos, gráficos avanzados y recomendaciones personalizadas para cada atleta.
+                        Analiza datos de Encoder Horizontal, Encoder Vertical V1 y Encoder Vertical Android con inteligencia artificial especializada. Análisis científico profesional para cada tipo de datos.
                     </p>
                     <div class="d-flex flex-wrap gap-3">
                         <a href="#upload" class="btn btn-gradient">
@@ -546,20 +573,20 @@
                         <div class="row text-center">
                             <div class="col-4">
                                 <div class="stats-card">
-                                    <span class="stats-number">98%</span>
-                                    <span class="stats-label">Precisión</span>
+                                    <span class="stats-number">3</span>
+                                    <span class="stats-label">Formatos</span>
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="stats-card">
-                                    <span class="stats-number">500+</span>
-                                    <span class="stats-label">Análisis</span>
+                                    <span class="stats-number">100%</span>
+                                    <span class="stats-label">Automático</span>
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="stats-card">
-                                    <span class="stats-number">24/7</span>
-                                    <span class="stats-label">Disponible</span>
+                                    <span class="stats-number">IA</span>
+                                    <span class="stats-label">Especializada</span>
                                 </div>
                             </div>
                         </div>
@@ -574,36 +601,51 @@
         <div class="container">
             <div class="row mb-5">
                 <div class="col-12 text-center">
-                    <h2 class="display-4 fw-bold mb-3">Tecnología de Vanguardia</h2>
-                    <p class="hero-subtitle">Herramientas profesionales para entrenadores de élite</p>
+                    <h2 class="display-4 fw-bold mb-3">Sistema Multi-Formato Profesional</h2>
+                    <p class="hero-subtitle">Análisis científico especializado para cada tipo de datos deportivos</p>
                 </div>
             </div>
             <div class="row g-4">
                 <div class="col-md-4">
                     <div class="glass-card feature-card h-100">
                         <div class="feature-icon">
-                            <i class="fas fa-user-group"></i>
+                            <i class="fas fa-running"></i>
                         </div>
-                        <h4>Análisis Multi-Atleta</h4>
-                        <p class="text-secondary">Identificación automática y análisis individual para cada deportista con métricas personalizadas.</p>
+                        <h4>Encoder Horizontal</h4>
+                        <p class="text-secondary">Análisis de sprint, aceleración, velocidad y distancia. Detección automática de perfiles de carrera.</p>
+                        <div class="mt-2">
+                            <span class="detection-badge">Velocidad vs Tiempo</span>
+                            <span class="detection-badge">Aceleración</span>
+                            <span class="detection-badge">Distancia</span>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="glass-card feature-card h-100">
                         <div class="feature-icon">
-                            <i class="fas fa-chart-line"></i>
+                            <i class="fas fa-dumbbell"></i>
                         </div>
-                        <h4>Gráficos Avanzados</h4>
-                        <p class="text-secondary">Perfiles fuerza-velocidad, evolución de métricas y comparativas entre atletas.</p>
+                        <h4>Encoder Vertical V1</h4>
+                        <p class="text-secondary">Perfiles fuerza-velocidad, análisis de repeticiones, potencia y relaciones carga-velocidad.</p>
+                        <div class="mt-2">
+                            <span class="detection-badge">Fuerza-Velocidad</span>
+                            <span class="detection-badge">Potencia</span>
+                            <span class="detection-badge">Repeticiones</span>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="glass-card feature-card h-100">
                         <div class="feature-icon">
-                            <i class="fas fa-brain"></i>
+                            <i class="fas fa-mobile-alt"></i>
                         </div>
-                        <h4>IA Especializada</h4>
-                        <p class="text-secondary">Algoritmos de inteligencia artificial entrenados específicamente para análisis deportivo.</p>
+                        <h4>Encoder Android</h4>
+                        <p class="text-secondary">Biomecánica completa, análisis de técnica, fatiga intra-serie y evolución temporal.</p>
+                        <div class="mt-2">
+                            <span class="detection-badge">Biomecánica</span>
+                            <span class="detection-badge">Técnica</span>
+                            <span class="detection-badge">Fatiga</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -619,7 +661,7 @@
                         <div class="row mb-4">
                             <div class="col-12 text-center">
                                 <h2 class="display-5 fw-bold mb-3">Analiza tus Datos</h2>
-                                <p class="hero-subtitle">Sube tu archivo del encoder y obtén un análisis completo en segundos</p>
+                                <p class="hero-subtitle">Sistema de detección automática multi-formato - Sube cualquier archivo compatible</p>
                             </div>
                         </div>
 
@@ -638,6 +680,26 @@
                         </div>
                         {% endif %}
 
+                        <!-- Información de detección -->
+                        {% if file_detection %}
+                        <div class="alert alert-info">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-robot me-2"></i>
+                                    <strong>Detección Automática Exitosa</strong>
+                                    <div class="mt-2">
+                                        <span class="badge bg-primary me-2">{{ file_detection.origin_app|upper }}</span>
+                                        <span class="badge bg-success me-2">{{ file_detection.file_type|upper }}</span>
+                                        <span class="badge bg-warning">{{ (file_detection.confidence * 100)|round|int }}% Confianza</span>
+                                    </div>
+                                </div>
+                                <div class="confidence-bar" style="width: 100px;">
+                                    <div class="confidence-fill" style="width: {{ file_detection.confidence * 100 }}%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
                         <!-- Formulario -->
                         <form method="post" enctype="multipart/form-data" action="/upload" onsubmit="showLoading()">
                             <div class="row g-4">
@@ -649,18 +711,19 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Origen del Archivo</label>
-                                    <select class="form-select" name="origen_app" required id="origenAppSelect" onchange="toggleEncoderOptions()">
+                                    <select class="form-select" name="origen_app" required id="origenAppSelect" onchange="toggleFormatOptions()">
                                         <option value="app_android_encoder_vertical">📱 Encoder Vertical Android</option>
+                                        <option value="encoder_vertical_v1" {% if form_data and form_data.origen_app == 'encoder_vertical_v1' %}selected{% endif %}>🏋️ Encoder Vertical V1</option>
                                         <option value="encoder_horizontal" {% if form_data and form_data.origen_app == 'encoder_horizontal' %}selected{% endif %}>🏃 Encoder Horizontal</option>
                                     </select>
                                 </div>
 
-                                <!-- Opciones específicas para Encoder Horizontal -->
-                                <div id="encoderHorizontalOptions" style="display: {% if form_data and form_data.origen_app == 'encoder_horizontal' %}block{% else %}none{% endif %};" class="col-12">
-                                    <div class="alert alert-info">
-                                        <i class="fas fa-robot me-2"></i>
+                                <!-- Información de formatos -->
+                                <div class="col-12">
+                                    <div class="alert alert-warning">
+                                        <i class="fas fa-info-circle me-2"></i>
                                         <strong>Detección Automática Activada</strong>
-                                        <p class="mb-0 mt-2">La IA detectará automáticamente el tipo de archivo (Velocidad, Aceleración, Distancia, Resumen) y realizará un análisis especializado.</p>
+                                        <p class="mb-0 mt-2">El sistema detectará automáticamente el tipo específico de archivo y aplicará el análisis científico correspondiente.</p>
                                     </div>
                                 </div>
 
@@ -678,7 +741,7 @@
                                     <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
                                         <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-primary"></i>
                                         <h5>Arrastra tu archivo o haz click aquí</h5>
-                                        <p class="text-secondary">Formatos: CSV, Excel (.xls, .xlsx)</p>
+                                        <p class="text-secondary">Formatos: CSV, Excel (.xls, .xlsx) - Detección automática multi-formato</p>
                                         
                                         <!-- Input oculto pero funcional -->
                                         <input type="file" class="d-none" name="file" id="fileInput" 
@@ -689,7 +752,7 @@
 
                                 <div class="col-12 text-center">
                                     <button type="submit" class="btn btn-gradient btn-lg">
-                                        <i class="fas fa-bolt me-2"></i>Analizar Datos con IA
+                                        <i class="fas fa-bolt me-2"></i>Analizar con IA Multi-Formato
                                     </button>
                                 </div>
                             </div>
@@ -707,7 +770,14 @@
                             <h3 class="mb-0">
                                 <i class="fas fa-table me-2"></i>Previsualización de Datos
                             </h3>
-                            <span class="feature-badge">{{ filename }}</span>
+                            <div>
+                                <span class="feature-badge">{{ filename }}</span>
+                                {% if file_detection %}
+                                <span class="detection-badge ms-2">
+                                    <i class="fas fa-microchip me-1"></i>{{ file_detection.file_type }}
+                                </span>
+                                {% endif %}
+                            </div>
                         </div>
                         
                         <div class="table-responsive">
@@ -718,129 +788,25 @@
             </div>
             {% endif %}
 
-            <!-- Análisis con IA para Encoder Horizontal -->
-            {% if encoder_analysis %}
-            <div class="row mt-4">
-                <div class="col-12">
-                    <div class="glass-card">
-                        <h3 class="mb-4">
-                            <i class="fas fa-chart-bar me-2"></i>Análisis Profesional con IA - Encoder Horizontal
-                        </h3>
-                        
-                        <!-- Resumen del análisis -->
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="alert alert-info">
-                                    <h5><i class="fas fa-file-alt me-2"></i>{{ encoder_analysis.tipo_archivo|title }}</h5>
-                                    <p class="mb-0">{{ encoder_analysis.nombre_archivo }}</p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="alert alert-success">
-                                    <h5><i class="fas fa-clock me-2"></i>Timestamp</h5>
-                                    <p class="mb-0">{{ encoder_analysis.timestamp_analisis }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Métricas clave -->
-                        {% if encoder_analysis.metricas_clave %}
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <h5><i class="fas fa-tachometer-alt me-2"></i>Métricas Clave</h5>
-                                <div class="table-responsive">
-                                    <table class="table table-dark">
-                                        <tbody>
-                                            {% for categoria, metricas in encoder_analysis.metricas_clave.items() %}
-                                            <tr>
-                                                <td colspan="2" class="fw-bold text-info">{{ categoria|title }}</td>
-                                            </tr>
-                                            {% for clave, valor in metricas.items() %}
-                                            <tr>
-                                                <td width="30%">{{ clave|replace('_', ' ')|title }}</td>
-                                                <td>
-                                                    {% if valor is number %}
-                                                        {{ "%.2f"|format(valor) }}
-                                                    {% else %}
-                                                        {{ valor }}
-                                                    {% endif %}
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
-                        
-                        <!-- Insights de IA -->
-                        {% if encoder_analysis.insights_ia %}
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <h5><i class="fas fa-brain me-2"></i>Insights de Inteligencia Artificial</h5>
-                                <div class="alert alert-warning">
-                                    {% for insight in encoder_analysis.insights_ia %}
-                                    <div class="mb-2">
-                                        <i class="fas fa-lightbulb me-2"></i>{{ insight }}
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
-                        
-                        <!-- Recomendaciones -->
-                        {% if encoder_analysis.recomendaciones %}
-                        <div class="row">
-                            <div class="col-12">
-                                <h5><i class="fas fa-clipboard-list me-2"></i>Recomendaciones de Entrenamiento</h5>
-                                <div class="alert alert-success">
-                                    {% for recomendacion in encoder_analysis.recomendaciones %}
-                                    <div class="mb-2">
-                                        <i class="fas fa-check-circle me-2"></i>{{ recomendacion }}
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
-
-                        <!-- Botones de acción -->
-                        <div class="row mt-4">
-                            <div class="col-12 text-center">
-                                <div class="d-flex flex-wrap gap-3 justify-content-center">
-                                    <a href="/generate_report" class="btn btn-success btn-lg">
-                                        <i class="fas fa-download me-2"></i>Descargar Reporte Completo
-                                    </a>
-                                    <a href="/preview_analysis" class="btn btn-outline-light btn-lg">
-                                        <i class="fas fa-eye me-2"></i>Vista Previa del Análisis
-                                    </a>
-                                    <a href="/clear_session" class="btn btn-outline-secondary btn-lg">
-                                        <i class="fas fa-redo me-2"></i>Nuevo Análisis
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Botones para otros tipos de archivos -->
-            {% if table_html and not encoder_analysis %}
+            <!-- Botones de acción -->
+            {% if table_html %}
             <div class="row mt-4">
                 <div class="col-12 text-center">
                     <div class="glass-card">
                         <div class="d-flex flex-wrap gap-3 justify-content-center">
+                            {% if not show_payment %}
                             <a href="/generate_report" class="btn btn-success btn-lg">
                                 <i class="fas fa-download me-2"></i>Descargar Reporte Completo
                             </a>
                             <a href="/preview_analysis" class="btn btn-outline-light btn-lg">
                                 <i class="fas fa-eye me-2"></i>Vista Previa del Análisis
                             </a>
-                            <a href="/clear_session" class="btn btn-outline-secondary btn-lg">
+                            {% else %}
+                            <button class="btn btn-success btn-lg" onclick="initiatePayment()">
+                                <i class="fas fa-credit-card me-2"></i>Generar Reporte Completo - $990 CLP
+                            </button>
+                            {% endif %}
+                            <a href="/" class="btn btn-outline-secondary btn-lg">
                                 <i class="fas fa-redo me-2"></i>Nuevo Análisis
                             </a>
                         </div>
@@ -857,9 +823,9 @@
             <div class="row">
                 <div class="col-lg-6">
                     <h4 class="mb-4">
-                        <i class="fas fa-chart-line me-2"></i>InertiaX
+                        <i class="fas fa-chart-line me-2"></i>InertiaX Pro v3.0
                     </h4>
-                    <p class="text-secondary">Plataforma de análisis deportivo con inteligencia artificial para entrenadores y atletas de alto rendimiento.</p>
+                    <p class="text-secondary">Sistema multi-formato de análisis deportivo con inteligencia artificial para entrenadores y atletas de alto rendimiento.</p>
                 </div>
                 <div class="col-lg-6 text-lg-end">
                     <div class="social-links">
@@ -868,25 +834,18 @@
                         <a href="#"><i class="fab fa-github"></i></a>
                         <a href="#"><i class="fab fa-instagram"></i></a>
                     </div>
-                    <p class="text-secondary mt-3">© 2024 InertiaX. Todos los derechos reservados.</p>
+                    <p class="text-secondary mt-3">© 2024 InertiaX Pro - Sistema Multi-Formato</p>
                 </div>
             </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+
     <script>
-        // Función para mostrar/ocultar opciones del Encoder Horizontal
-        function toggleEncoderOptions() {
-            const select = document.getElementById('origenAppSelect');
-            const optionsDiv = document.getElementById('encoderHorizontalOptions');
-            
-            if (select.value === 'encoder_horizontal') {
-                optionsDiv.style.display = 'block';
-            } else {
-                optionsDiv.style.display = 'none';
-            }
-        }
+        // Configuración de Mercado Pago
+        const mp = new MercadoPago('{{ config.MP_PUBLIC_KEY }}', { locale: 'es-CL' });
 
         // Mostrar loading
         function showLoading() {
@@ -903,51 +862,27 @@
                 const fileSize = (file.size / (1024 * 1024)).toFixed(2);
                 const origenApp = document.getElementById('origenAppSelect').value;
 
-                let detectedType = '';
+                let formatInfo = '';
                 if (origenApp === 'encoder_horizontal') {
-                    // Simular detección para Encoder Horizontal
-                    const fileNameLower = fileName.toLowerCase();
-                    
-                    if (fileNameLower.includes('velocidad') && fileNameLower.includes('distancia')) {
-                        detectedType = '📊 Velocidad vs Distancia';
-                    } else if (fileNameLower.includes('velocidad')) {
-                        detectedType = '🚀 Velocidad vs Tiempo';
-                    } else if (fileNameLower.includes('aceleracion') || fileNameLower.includes('aceleración')) {
-                        detectedType = '💥 Aceleración vs Tiempo';
-                    } else if (fileNameLower.includes('distancia')) {
-                        detectedType = '📏 Distancia vs Tiempo';
-                    } else if (fileNameLower.includes('resumen') || fileNameLower.includes('sprint_data')) {
-                        detectedType = '📈 Resumen de Métricas';
-                    } else {
-                        detectedType = '🔍 Archivo del Encoder Horizontal';
-                    }
-                    
-                    document.getElementById('fileInfo').innerHTML = `
-                        <div class="text-success text-center">
-                            <i class="fas fa-check-circle fa-2x mb-3"></i>
-                            <h5>✅ Archivo listo para análisis con IA</h5>
-                            <p class="mb-1"><strong>${fileName}</strong></p>
-                            <p class="mb-1"><strong>Tipo detectado:</strong> ${detectedType}</p>
-                            <small class="text-secondary">Tamaño: ${fileSize} MB</small><br>
-                            <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="resetFileInput()">
-                                <i class="fas fa-redo me-1"></i>Cambiar archivo
-                            </button>
-                        </div>
-                    `;
+                    formatInfo = '<p class="mb-1"><small class="text-info">🔄 Detección automática: Velocidad, Aceleración, Distancia, Resumen</small></p>';
+                } else if (origenApp === 'encoder_vertical_v1') {
+                    formatInfo = '<p class="mb-1"><small class="text-info">🔄 Detección automática: Fuerza-Velocidad, Repeticiones, Potencia</small></p>';
                 } else {
-                    // Para Encoder Vertical
-                    document.getElementById('fileInfo').innerHTML = `
-                        <div class="text-success text-center">
-                            <i class="fas fa-check-circle fa-2x mb-3"></i>
-                            <h5>✅ Archivo listo para analizar</h5>
-                            <p class="mb-1"><strong>${fileName}</strong></p>
-                            <small class="text-secondary">Tamaño: ${fileSize} MB</small><br>
-                            <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="resetFileInput()">
-                                <i class="fas fa-redo me-1"></i>Cambiar archivo
-                            </button>
-                        </div>
-                    `;
+                    formatInfo = '<p class="mb-1"><small class="text-info">🔄 Detección automática: Biomecánica, Velocidad, Carga</small></p>';
                 }
+
+                document.getElementById('fileInfo').innerHTML = `
+                    <div class="text-success text-center">
+                        <i class="fas fa-check-circle fa-2x mb-3"></i>
+                        <h5>✅ Archivo listo para análisis multi-formato</h5>
+                        <p class="mb-1"><strong>${fileName}</strong></p>
+                        ${formatInfo}
+                        <small class="text-secondary">Tamaño: ${fileSize} MB</small><br>
+                        <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="resetFileInput()">
+                            <i class="fas fa-redo me-1"></i>Cambiar archivo
+                        </button>
+                    </div>
+                `;
             }
         }
 
@@ -986,6 +921,26 @@
             handleFileSelect(document.getElementById('fileInput'));
         }
 
+        // Iniciar pago
+        function initiatePayment() {
+            showLoading();
+
+            fetch('/create_preference', { method: 'POST' })
+                .then(response => response.json())
+                .then(preference => {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    if (preference.init_point) {
+                        window.location.href = preference.init_point;
+                    } else {
+                        alert('❌ Error al iniciar el pago');
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    alert('❌ Error: ' + error.message);
+                });
+        }
+
         // Smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
@@ -1021,7 +976,7 @@
             observer.observe(card);
         });
 
-        console.log('🚀 InertiaX Platform Loaded - Encoder Horizontal Support Active');
+        console.log('🚀 InertiaX Pro Multi-Formato Platform Loaded');
     </script>
 </body>
 </html>
