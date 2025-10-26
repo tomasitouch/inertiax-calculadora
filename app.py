@@ -1344,7 +1344,7 @@ def health():
     return jsonify({
         "status": "ok", 
         "message": "InertiaX Professional API Running",
-        "version": "3.0.0",
+        "version": "4.0.0",
         "timestamp": datetime.now().isoformat()
     })
 
@@ -1556,7 +1556,7 @@ def generate_report():
         # 6. Creación de paquete profesional
         zip_path = os.path.join(_job_dir(job_id), f"reporte_profesional_{uuid.uuid4().hex}.zip")
         with zipfile.ZipFile(zip_path, "w") as zf:
-            zf.write(pdf_path, "INERTIAX_PRO_Reporte_Cientifico.pdf")
+            zf.write(pdf_path, "INERTIAX_PRO_Reporte_Personal_Trainer.pdf")
             zf.write(file_path, f"datos_originales/{os.path.basename(meta.get('file_name', 'datos.csv'))}")
             
             # Agregar datos procesados
@@ -1576,7 +1576,7 @@ def generate_report():
         return send_file(
             zip_path, 
             as_attachment=True, 
-            download_name=f"InertiaX_Pro_Reporte_{datetime.now().strftime('%Y%m%d_%H%M')}.zip"
+            download_name=f"InertiaX_Pro_Reporte_PT_{datetime.now().strftime('%Y%m%d_%H%M')}.zip"
         )
         
     except Exception as e:
