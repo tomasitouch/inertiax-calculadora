@@ -733,67 +733,35 @@
         document.getElementById('loadingOverlay').style.display = 'flex';
         return true;
     }
+function handleFileSelect(input) {
+    const file = input.files[0];
 
-    // Manejar selección de archivo
-    function handleFileSelect(input) {
-        const file = input.files[0];
-        console.log('📁 Archivo seleccionado:', file);
+    if (file) {
+        const fileName = file.name;
+        const fileSize = (file.size / (1024 * 1024)).toFixed(2);
 
-        if (file) {
-            const fileName = file.name;
-            const fileSize = (file.size / (1024 * 1024)).toFixed(2);
-
-            // Validaciones
-            const allowedExtensions = ['.csv', '.xls', '.xlsx'];
-            const fileExtension = fileName.toLowerCase().substring(fileName.lastIndexOf('.'));
-
-            if (!allowedExtensions.includes(fileExtension)) {
-                alert('❌ Formato no permitido. Usa: .csv, .xls, .xlsx');
-                input.value = '';
-                return;
-            }
-
-            if (file.size > 20 * 1024 * 1024) {
-                alert('❌ Archivo demasiado grande. Máximo 20MB');
-                input.value = '';
-                return;
-            }
-
-            // Ocultar el input y mostrar confirmación
-            input.style.display = 'none';
-
-            // Actualizar UI
-            document.getElementById('uploadArea').innerHTML = `
-                <div class="text-success text-center">
-                    <i class="fas fa-check-circle fa-2x mb-3"></i>
-                    <h5>✅ Archivo listo para analizar</h5>
-                    <p class="mb-1"><strong>${fileName}</strong></p>
-                    <small class="text-secondary">Tamaño: ${fileSize} MB</small><br>
-                    <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="resetFileInput()">
-                        <i class="fas fa-redo me-1"></i>Cambiar archivo
-                    </button>
-                </div>
-            `;
-
-            document.getElementById('uploadArea').classList.add('dragover');
-            setTimeout(() => {
-                document.getElementById('uploadArea').classList.remove('dragover');
-            }, 2000);
-        }
-    }
-
-    // Función para resetear el input de archivo
-    function resetFileInput() {
-        document.getElementById('uploadArea').innerHTML = `
-            <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-primary"></i>
-            <h5>Arrastra tu archivo o haz click aquí</h5>
-            <p class="text-secondary">Formatos: CSV, Excel (.xls, .xlsx)</p>
-
-            <input type="file" class="form-control mt-3" name="file" id="fileInput" 
-                   accept=".csv,.xls,.xlsx" required onchange="handleFileSelect(this)"
-                   style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white;">
+        // En vez de reemplazar el uploadArea
+        document.getElementById('fileInfo').innerHTML = `
+            <div class="text-success text-center">
+                <i class="fas fa-check-circle fa-2x mb-3"></i>
+                <h5>✅ Archivo listo para analizar</h5>
+                <p class="mb-1"><strong>${fileName}</strong></p>
+                <small class="text-secondary">Tamaño: ${fileSize} MB</small><br>
+                <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="resetFileInput()">
+                    <i class="fas fa-redo me-1"></i>Cambiar archivo
+                </button>
+            </div>
         `;
     }
+}
+
+
+    // Función para resetear el input de archivo
+function resetFileInput() {
+    document.getElementById('fileInput').value = "";
+    document.getElementById('fileInfo').innerHTML = "";
+}
+
 
     // Drag and drop
     const uploadArea = document.getElementById('uploadArea');
