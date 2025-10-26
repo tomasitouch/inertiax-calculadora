@@ -942,7 +942,7 @@ def create_preference():
         return jsonify(error="SESIÓN INVÁLIDA"), 400
 
     # Precio profesional por servicio premium
-    price = 9900  # Servicio profesional premium
+    price = 990  # Servicio profesional premium
 
     pref_data = {
         "items": [{
