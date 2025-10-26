@@ -1613,7 +1613,7 @@ def execute_ai_charts_code(python_code: str, df: pd.DataFrame) -> List[BytesIO]:
 
 @app.route("/preview_analysis")
 def preview_analysis():
-    """Vista previa profesional del análisis"""
+    """Vista previa profesional del análisis - Personal Trainer"""
     job_id = session.get("job_id")
     if not job_id:
         return redirect(url_for("index"))
@@ -1631,15 +1631,22 @@ def preview_analysis():
         file_detection = meta.get("file_detection", {})
         df = preprocess_data_by_origin(df, meta.get("form", {}).get("origen_app", ""), file_detection.get("file_type", "desconocido"))
         
-        # Análisis científico específico
+        # Análisis científico específico como Personal Trainer
         ai_result = run_professional_ai_analysis(df, meta.get("form", {}), file_detection)
         
         return render_template(
             "preview.html",
-            ai_analysis=ai_result.get("analysis", "Análisis científico en progreso..."),
-            recommendations=ai_result.get("recommendations", []),
+            ai_analysis=ai_result.get("technical_analysis", "Análisis científico en progreso..."),
+            athlete_profile=ai_result.get("athlete_profile", "Perfil en análisis..."),
+            strengths_weaknesses=ai_result.get("strengths_weaknesses", {}),
+            training_recommendations=ai_result.get("training_recommendations", []),
+            performance_metrics=ai_result.get("performance_metrics", {}),
+            nutrition_advice=ai_result.get("nutrition_advice", []),
+            recovery_strategies=ai_result.get("recovery_strategies", []),
             filename=meta.get("file_name"),
-            file_detection=file_detection
+            file_detection=file_detection,
+            form_data=meta.get("form", {}),
+            upload_time=meta.get("upload_time", datetime.now().isoformat())
         )
         
     except Exception as e:
