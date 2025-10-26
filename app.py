@@ -853,14 +853,50 @@ def health():
         "timestamp": datetime.now().isoformat()
     })
 
-@app.route('/upload', methods=['GET', 'POST'])
+@app.route("/upload", methods=["GET", "POST"])
 def upload():
-    """Endpoint profesional para carga de datos"""
+    if request.method == "GET":
+        # Al refrescar, recuperar el job y mostrar previsualización
+        job_id = session.get("job_id")
+        if not job_id:
+            return render_template("index.html")
+
+        meta = _load_meta(job_id)
+        if not meta:
+            return render_template("index.html")
+
+        try:
+            df = parse_dataframe(meta["file_path"])
+            df = preprocess_data_by_origin(df, meta["form"]["origen_app"])
+
+            table_html = df.head(15).to_html(
+                classes="table table-striped table-bordered table-hover table-sm",
+                index=False,
+                escape=False
+            )
+
+            return render_template(
+                "index.html",
+                table_html=table_html,
+                filename=meta["file_name"],
+                form_data=meta["form"],
+                mensaje=("🔓 ACCESO PREMIUM ACTIVADO - Análisis profesional disponible"
+                        if meta["payment_ok"]
+                        else None),
+                show_payment=(not meta["payment_ok"]),
+            )
+        except:
+            return render_template("index.html")
+
+    # ===== POST =====
+    f = request.files.get("file")
+    if not f or f.filename == "":
+        return render_template("index.html", error="❌ ARCHIVO NO ESPECIFICADO - Seleccione un archivo para análisis")
+
     try:
         job_id = _ensure_job()
         session.modified = True
 
-        # Datos del formulario profesional
         form = {
             "nombre_entrenador": request.form.get("nombre_entrenador", "").strip(),
             "origen_app": request.form.get("origen_app", "").strip(),
@@ -869,7 +905,6 @@ def upload():
 
         log.info(f"📥 Solicitud de análisis profesional de: {form['nombre_entrenador']}")
 
-        # Verificación de código premium
         code = form.get("codigo_invitado", "")
         payment_ok = False
         mensaje = None
@@ -877,59 +912,45 @@ def upload():
             payment_ok = True
             mensaje = "🔓 ACCESO PREMIUM ACTIVADO - Análisis profesional disponible"
 
-        f = request.files.get("file")
-        if not f or f.filename == "":
-            return render_template("index.html", error="❌ ARCHIVO NO ESPECIFICADO - Seleccione un archivo para análisis")
-
-        if not _allowed_file(f.filename):
-            return render_template("index.html", error="❌ FORMATO NO SOPORTADO - Use archivos CSV o Excel")
-
-        # Procesamiento profesional del archivo
         ext = os.path.splitext(f.filename)[1].lower()
         safe_name = f"{uuid.uuid4().hex}{ext}"
         save_path = os.path.join(_job_dir(job_id), safe_name)
         f.save(save_path)
 
-        # Metadatos profesionales
         meta = {
             "file_name": f.filename,
             "file_path": save_path,
             "payment_ok": payment_ok,
             "form": form,
-            "upload_time": datetime.now().isoformat()
+            "upload_time": datetime.now().isoformat(),
         }
         _save_meta(job_id, meta)
 
-        # Previsualización profesional
-        try:
-            df = parse_dataframe(save_path)
-            df = preprocess_data_by_origin(df, form.get("origen_app", ""))
-            
-            # Generar tabla HTML profesional
-            table_html = df.head(15).to_html(
-                classes="table table-striped table-bordered table-hover table-sm",
-                index=False,
-                escape=False
-            )
-            
-            log.info(f"✅ Previsualización generada: {len(df)} registros procesados")
-            
-            return render_template(
-                "index.html",
-                table_html=table_html,
-                filename=f.filename,
-                form_data=form,
-                mensaje=mensaje,
-                show_payment=(not payment_ok),
-            )
-            
-        except Exception as e:
-            log.error(f"❌ Error en procesamiento: {str(e)}")
-            return render_template("index.html", error=f"❌ ERROR EN PROCESAMIENTO: {str(e)}")
-            
+        df = parse_dataframe(save_path)
+        df = preprocess_data_by_origin(df, form["origen_app"])
+
+        table_html = df.head(15).to_html(
+            classes="table table-striped table-bordered table-hover table-sm",
+            index=False,
+            escape=False
+        )
+
+        return render_template(
+            "index.html",
+            table_html=table_html,
+            filename=f.filename,
+            form_data=form,
+            mensaje=mensaje,
+            show_payment=(not payment_ok),
+        )
+
     except Exception as e:
-        log.error(f"💥 Error general en upload: {str(e)}")
-        return render_template("index.html", error=f"❌ ERROR DEL SISTEMA: {str(e)}")
+        log.error(f"❌ Error en procesamiento: {str(e)}")
+        return render_template("index.html", error=f"❌ ERROR EN PROCESAMIENTO: {str(e)}")
+
+
+
+
 
 @app.route("/create_preference", methods=["POST"])
 def create_preference():
