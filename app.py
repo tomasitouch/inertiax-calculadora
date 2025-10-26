@@ -429,7 +429,7 @@ def preprocess_encoder_vertical_v1(df: pd.DataFrame, file_type: str) -> pd.DataF
             
         # Identificar tipo de test
         if 'repeticion' in df.columns:
-            if df['repeticion'].astype(str).str.contains('\.').any():
+            if df['repeticion'].astype(str).str.contains(r'\.', regex=True).any():
                 df['tipo_test'] = 'perfil_fuerza_velocidad'
             else:
                 df['tipo_test'] = 'entrenamiento_normal'
