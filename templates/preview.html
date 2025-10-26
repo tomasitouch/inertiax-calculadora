@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InertiaX Pro - Vista Previa del Análisis</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2E86AB;
+            --secondary-color: #A23B72;
+            --accent-color: #F18F01;
+            --dark-color: #3B1F2B;
+            --light-color: #f8f9fa;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .professional-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+        }
+        
+        .professional-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 20px 20px 0 0 !important;
+            padding: 1.5rem;
+            border: none;
+        }
+        
+        .analysis-section {
+            border-left: 4px solid var(--primary-color);
+            padding-left: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .strength-item {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-left: 4px solid var(--success-color);
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+        }
+        
+        .weakness-item {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            border-left: 4px solid var(--danger-color);
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+        }
+        
+        .opportunity-item {
+            background: linear-gradient(135deg, #cce7ff, #b3d9ff);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+        }
+        
+        .recommendation-card {
+            background: white;
+            border: 1px solid #e3f2fd;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .recommendation-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(46, 134, 171, 0.1);
+        }
+        
+        .metric-badge {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--dark-color);
+            font-weight: 500;
+            border: none;
+            padding: 1rem 1.5rem;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 10px;
+            border: none;
+        }
+        
+        .progress {
+            height: 8px;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+        }
+        
+        .floating-action-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, var(--accent-color), #e67e22);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+            box-shadow: 0 10px 25px rgba(241, 143, 1, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .floating-action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 30px rgba(241, 143, 1, 0.4);
+        }
+        
+        .analysis-tag {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+            padding-left: 1.5rem;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -0.5rem;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px var(--primary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .professional-card {
+                margin: 1rem;
+                border-radius: 15px;
+            }
+            
+            .card-header {
+                padding: 1rem;
+            }
+            
+            .floating-action-btn {
+                bottom: 1rem;
+                right: 1rem;
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="fas fa-dumbbell me-2"></i>
+                INERTIAX PRO
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/">
+                    <i class="fas fa-home me-1"></i> Inicio
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <!-- Header Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="professional-card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h2 class="mb-2">
+                                    <i class="fas fa-chart-line me-2"></i>
+                                    VISTA PREVIA DEL ANÁLISIS
+                                </h2>
+                                <p class="mb-0">Análisis profesional generado por nuestro sistema de IA especializada</p>
+                            </div>
+                            <div class="col-md-4 text-md-end">
+                                <span class="analysis-tag">
+                                    <i class="fas fa-robot me-1"></i>
+                                    PERSONAL TRAINER AI
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-file-alt me-2"></i>Archivo Analizado</h5>
+                                <p class="text-muted">{{ filename }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-user-tie me-2"></i>Entrenador</h5>
+                                <p class="text-muted">{{ form_data.nombre_entrenador or "Especialista Inertiax Pro" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Tabs -->
+        <div class="professional-card">
+            <div class="card-body">
+                <ul class="nav nav-tabs mb-4" id="analysisTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">
+                            <i class="fas fa-user me-2"></i>Perfil del Atleta
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="analysis-tab" data-bs-toggle="tab" data-bs-target="#analysis" type="button" role="tab">
+                            <i class="fas fa-microscope me-2"></i>Análisis Técnico
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="recommendations-tab" data-bs-toggle="tab" data-bs-target="#recommendations" type="button" role="tab">
+                            <i class="fas fa-dumbbell me-2"></i>Plan de Entrenamiento
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="metrics-tab" data-bs-toggle="tab" data-bs-target="#metrics" type="button" role="tab">
+                            <i class="fas fa-chart-bar me-2"></i>Métricas
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="analysisTabsContent">
+                    <!-- Tab 1: Perfil del Atleta -->
+                    <div class="tab-pane fade show active" id="profile" role="tabpanel">
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="analysis-section">
+                                    <h4 class="mb-3">
+                                        <i class="fas fa-user-circle me-2"></i>
+                                        Perfil del Deportista
+                                    </h4>
+                                    <div class="professional-card">
+                                        <div class="card-body">
+                                            <p style="white-space: pre-line; line-height: 1.6;">{{ athlete_profile }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Fortalezas y Debilidades -->
+                                <div class="analysis-section">
+                                    <h4 class="mb-3">
+                                        <i class="fas fa-balance-scale me-2"></i>
+                                        Análisis FODA
+                                    </h4>
+                                    
+                                    {% if strengths_weaknesses %}
+                                    <div class="row">
+                                        {% if strengths_weaknesses.strengths %}
+                                        <div class="col-md-6 mb-3">
+                                            <h5 class="text-success">
+                                                <i class="fas fa-check-circle me-2"></i>
+                                                Fortalezas
+                                            </h5>
+                                            {% for strength in strengths_weaknesses.strengths %}
+                                            <div class="strength-item">
+                                                <i class="fas fa-star me-2 text-success"></i>
+                                                {{ strength }}
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if strengths_weaknesses.weaknesses %}
+                                        <div class="col-md-6 mb-3">
+                                            <h5 class="text-danger">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                Áreas de Mejora
+                                            </h5>
+                                            {% for weakness in strengths_weaknesses.weaknesses %}
+                                            <div class="weakness-item">
+                                                <i class="fas fa-bullseye me-2 text-danger"></i>
+                                                {{ weakness }}
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if strengths_weaknesses.opportunities %}
+                                        <div class="col-12 mt-3">
+                                            <h5 class="text-primary">
+                                                <i class="fas fa-rocket me-2"></i>
+                                                Oportunidades
+                                            </h5>
+                                            {% for opportunity in strengths_weaknesses.opportunities %}
+                                            <div class="opportunity-item">
+                                                <i class="fas fa-lightbulb me-2 text-primary"></i>
+                                                {{ opportunity }}
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-4">
+                                <!-- Métricas Rápidas -->
+                                <div class="professional-card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-tachometer-alt me-2"></i>
+                                            Métricas Clave
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if performance_metrics %}
+                                        <div class="mb-3">
+                                            <label class="form-label">Nivel Actual</label>
+                                            <div class="metric-badge">
+                                                {{ performance_metrics.current_level or "En Evaluación" }}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">Tendencia de Progreso</label>
+                                            <div class="metric-badge" style="background: linear-gradient(135deg, {% if performance_metrics.progress_trend == 'Positivo' %}#28a745{% else %}#ffc107{% endif %}, {% if performance_metrics.progress_trend == 'Positivo' %}#20c997{% else %}#fd7e14{% endif %});">
+                                                {{ performance_metrics.progress_trend or "Estable" }}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">Calidad de Datos</label>
+                                            <div class="progress">
+                                                <div class="progress-bar" style="width: {% if performance_metrics.data_quality == 'Alta' %}85%{% elif performance_metrics.data_quality == 'Media' %}60%{% else %}40%{% endif %};"></div>
+                                            </div>
+                                            <small class="text-muted">{{ performance_metrics.data_quality or "Media" }}</small>
+                                        </div>
+                                        {% else %}
+                                        <p class="text-muted">Métricas en proceso de cálculo...</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Información del Sistema -->
+                                <div class="professional-card mt-3">
+                                    <div class="card-body">
+                                        <h6 class="mb-3">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            Información del Análisis
+                                        </h6>
+                                        <div class="timeline">
+                                            <div class="timeline-item">
+                                                <strong>Sistema:</strong><br>
+                                                <span class="text-muted">{{ file_detection.origin_app | replace('_', ' ') | title }}</span>
+                                            </div>
+                                            <div class="timeline-item">
+                                                <strong>Tipo de Datos:</strong><br>
+                                                <span class="text-muted">{{ file_detection.file_type | replace('_', ' ') | title }}</span>
+                                            </div>
+                                            <div class="timeline-item">
+                                                <strong>Confianza:</strong><br>
+                                                <span class="text-muted">{{ (file_detection.confidence * 100) | round(1) }}%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Análisis Técnico -->
+                    <div class="tab-pane fade" id="analysis" role="tabpanel">
+                        <div class="analysis-section">
+                            <h4 class="mb-4">
+                                <i class="fas fa-microscope me-2"></i>
+                                Análisis Técnico Detallado
+                            </h4>
+                            <div class="professional-card">
+                                <div class="card-body">
+                                    <div style="white-space: pre-line; line-height: 1.7; font-size: 1.05rem;">
+                                        {{ ai_analysis }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nutrición y Recuperación -->
+                        <div class="row mt-4">
+                            {% if nutrition_advice and nutrition_advice|length > 0 %}
+                            <div class="col-md-6">
+                                <div class="professional-card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-apple-alt me-2"></i>
+                                            Recomendaciones de Nutrición
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {% for advice in nutrition_advice %}
+                                        <div class="recommendation-card">
+                                            <i class="fas fa-leaf text-success me-2"></i>
+                                            {{ advice }}
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if recovery_strategies and recovery_strategies|length > 0 %}
+                            <div class="col-md-6">
+                                <div class="professional-card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-bed me-2"></i>
+                                            Estrategias de Recuperación
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {% for strategy in recovery_strategies %}
+                                        <div class="recommendation-card">
+                                            <i class="fas fa-heartbeat text-danger me-2"></i>
+                                            {{ strategy }}
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Plan de Entrenamiento -->
+                    <div class="tab-pane fade" id="recommendations" role="tabpanel">
+                        <div class="analysis-section">
+                            <h4 class="mb-4">
+                                <i class="fas fa-dumbbell me-2"></i>
+                                Plan de Entrenamiento Personalizado
+                            </h4>
+                            
+                            {% if training_recommendations and training_recommendations|length > 0 %}
+                            <div class="row">
+                                {% for recommendation in training_recommendations %}
+                                <div class="col-lg-6 mb-4">
+                                    <div class="professional-card h-100">
+                                        <div class="card-body">
+                                            {% if recommendation is mapping %}
+                                                <h5 class="text-primary mb-3">
+                                                    <i class="fas fa-running me-2"></i>
+                                                    {{ recommendation.category or "Entrenamiento" }}
+                                                </h5>
+                                                
+                                                {% if recommendation.exercises %}
+                                                <h6 class="mb-2">Ejercicios Recomendados:</h6>
+                                                <ul class="list-unstyled">
+                                                    {% for exercise in recommendation.exercises %}
+                                                    <li class="mb-2">
+                                                        <i class="fas fa-check-circle text-success me-2"></i>
+                                                        {{ exercise }}
+                                                    </li>
+                                                    {% endfor %}
+                                                </ul>
+                                                {% endif %}
+                                                
+                                                {% if recommendation.prescription %}
+                                                <div class="mt-3 p-3 bg-light rounded">
+                                                    <strong>Prescripción:</strong><br>
+                                                    {{ recommendation.prescription }}
+                                                </div>
+                                                {% endif %}
+                                                
+                                                {% if recommendation.rationale %}
+                                                <div class="mt-3">
+                                                    <strong>Fundamento Científico:</strong><br>
+                                                    <small class="text-muted">{{ recommendation.rationale }}</small>
+                                                </div>
+                                                {% endif %}
+                                            {% else %}
+                                                <div class="d-flex align-items-start">
+                                                    <i class="fas fa-bullseye text-primary mt-1 me-3"></i>
+                                                    <div>
+                                                        {{ recommendation }}
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-dumbbell fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">Recomendaciones de entrenamiento en proceso...</h5>
+                                <p class="text-muted">Nuestro sistema de IA está generando tu plan personalizado</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Tab 4: Métricas -->
+                    <div class="tab-pane fade" id="metrics" role="tabpanel">
+                        <div class="analysis-section">
+                            <h4 class="mb-4">
+                                <i class="fas fa-chart-bar me-2"></i>
+                                Métricas y Estadísticas
+                            </h4>
+                            
+                            {% if performance_metrics %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="professional-card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Rendimiento General</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label>Nivel de Rendimiento</label>
+                                                <div class="progress mb-2">
+                                                    <div class="progress-bar" style="width: 
+                                                        {% if performance_metrics.current_level == 'Elite' %}95%
+                                                        {% elif performance_metrics.current_level == 'Avanzado' %}75%
+                                                        {% elif performance_metrics.current_level == 'Intermedio' %}50%
+                                                        {% else %}25%{% endif %}">
+                                                    </div>
+                                                </div>
+                                                <small class="text-muted">{{ performance_metrics.current_level or "En evaluación" }}</small>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label>Tendencia de Progreso</label>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-arrow-{% if performance_metrics.progress_trend == 'Positivo' %}up text-success{% elif performance_metrics.progress_trend == 'Negativo' %}down text-danger{% else %}right text-warning{% endif %} me-2"></i>
+                                                    <span>{{ performance_metrics.progress_trend or "Estable" }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="professional-card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Calidad del Análisis</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label>Confianza del Sistema</label>
+                                                <div class="progress mb-2">
+                                                    <div class="progress-bar" style="width: {{ file_detection.confidence * 100 }}%"></div>
+                                                </div>
+                                                <small class="text-muted">{{ (file_detection.confidence * 100) | round(1) }}%</small>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label>Calidad de Datos</label>
+                                                <div class="progress mb-2">
+                                                    <div class="progress-bar" style="width: 
+                                                        {% if performance_metrics.data_quality == 'Alta' %}85%
+                                                        {% elif performance_metrics.data_quality == 'Media' %}60%
+                                                        {% else %}40%{% endif %}">
+                                                    </div>
+                                                </div>
+                                                <small class="text-muted">{{ performance_metrics.data_quality or "Media" }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">Métricas en cálculo...</h5>
+                                <p class="text-muted">Nuestro sistema está procesando las métricas detalladas</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="floating-action-btn" onclick="generateFullReport()" title="Generar Reporte Completo">
+        <i class="fas fa-download"></i>
+    </button>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function generateFullReport() {
+            // Mostrar loading
+            const btn = event.target;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+            
+            // Redirigir a la generación del reporte completo
+            setTimeout(() => {
+                window.location.href = '/generate_report';
+            }, 1000);
+        }
+        
+        // Smooth scrolling para anclas
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Actualizar el título de la pestaña con el progreso
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.nav-tabs .nav-link');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.textContent.trim();
+                    document.title = `InertiaX Pro - ${tabName}`;
+                });
+            });
+        });
+    </script>
+</body>
+</html>
