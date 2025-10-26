@@ -718,143 +718,122 @@
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://sdk.mercadopago.com/js/v2"></script>
-    
-    <script>
-        // Configuración de Mercado Pago
-        const mp = new MercadoPago('{{ config.MP_PUBLIC_KEY }}', { locale: 'es-CL' });
 
-        // Mostrar loading
-        function showLoading() {
-            document.getElementById('loadingOverlay').style.display = 'flex';
-            return true;
-        }
 
-        // Manejar selección de archivo
-        // Manejar selección de archivo
-        function handleFileSelect(input) {
-            const file = input.files[0];
-            console.log('📁 Archivo seleccionado:', file);
-            
-            if (file) {
-                const fileName = file.name;
-                const fileSize = (file.size / (1024 * 1024)).toFixed(2);
-                
-                // Validaciones
-                const allowedExtensions = ['.csv', '.xls', '.xlsx'];
-                const fileExtension = fileName.toLowerCase().substring(fileName.lastIndexOf('.'));
-                
-                if (!allowedExtensions.includes(fileExtension)) {
-                    alert('❌ Formato no permitido. Usa: .csv, .xls, .xlsx');
-                    input.value = '';
-                    return;
-                }
-                
-                if (file.size > 20 * 1024 * 1024) {
-                    alert('❌ Archivo demasiado grande. Máximo 20MB');
-                    input.value = '';
-                    return;
-                }
-                
-                // Ocultar el input y mostrar confirmación
-                input.style.display = 'none';
-                
-                // Actualizar UI
-                document.getElementById('uploadArea').innerHTML = `
-                    <div class="text-success text-center">
-                        <i class="fas fa-check-circle fa-2x mb-3"></i>
-                        <h5>✅ Archivo listo para analizar</h5>
-                        <p class="mb-1"><strong>${fileName}</strong></p>
-                        <small class="text-secondary">Tamaño: ${fileSize} MB</small>
-                        <br>
-                        <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="resetFileInput()">
-                            <i class="fas fa-redo me-1"></i>Cambiar archivo
-                        </button>
-                    </div>
-                `;
-                
-                document.getElementById('uploadArea').classList.add('dragover');
-                setTimeout(() => {
-                    document.getElementById('uploadArea').classList.remove('dragover');
-                }, 2000);
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+
+<script>
+    // Configuración de Mercado Pago
+    const mp = new MercadoPago('{{ config.MP_PUBLIC_KEY }}', { locale: 'es-CL' });
+
+    // Mostrar loading
+    function showLoading() {
+        document.getElementById('loadingOverlay').style.display = 'flex';
+        return true;
+    }
+
+    // Manejar selección de archivo
+    function handleFileSelect(input) {
+        const file = input.files[0];
+        console.log('📁 Archivo seleccionado:', file);
+
+        if (file) {
+            const fileName = file.name;
+            const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+
+            // Validaciones
+            const allowedExtensions = ['.csv', '.xls', '.xlsx'];
+            const fileExtension = fileName.toLowerCase().substring(fileName.lastIndexOf('.'));
+
+            if (!allowedExtensions.includes(fileExtension)) {
+                alert('❌ Formato no permitido. Usa: .csv, .xls, .xlsx');
+                input.value = '';
+                return;
             }
-        }
-        
-        // Función para resetear el input de archivo
-        function resetFileInput() {
+
+            if (file.size > 20 * 1024 * 1024) {
+                alert('❌ Archivo demasiado grande. Máximo 20MB');
+                input.value = '';
+                return;
+            }
+
+            // Ocultar el input y mostrar confirmación
+            input.style.display = 'none';
+
+            // Actualizar UI
             document.getElementById('uploadArea').innerHTML = `
-                <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-primary"></i>
-                <h5>Arrastra tu archivo o haz click aquí</h5>
-                <p class="text-secondary">Formatos: CSV, Excel (.xls, .xlsx)</p>
-                
-                <input type="file" class="form-control mt-3" name="file" id="fileInput" 
-                       accept=".csv,.xls,.xlsx" required onchange="handleFileSelect(this)"
-                       style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white;">
+                <div class="text-success text-center">
+                    <i class="fas fa-check-circle fa-2x mb-3"></i>
+                    <h5>✅ Archivo listo para analizar</h5>
+                    <p class="mb-1"><strong>${fileName}</strong></p>
+                    <small class="text-secondary">Tamaño: ${fileSize} MB</small><br>
+                    <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="resetFileInput()">
+                        <i class="fas fa-redo me-1"></i>Cambiar archivo
+                    </button>
+                </div>
             `;
+
+            document.getElementById('uploadArea').classList.add('dragover');
+            setTimeout(() => {
+                document.getElementById('uploadArea').classList.remove('dragover');
+            }, 2000);
         }
-                
-                if (file.size > 20 * 1024 * 1024) {
-                    alert('❌ Archivo demasiado grande. Máximo 20MB');
-                    input.value = '';
-                    return;
-                }
-                
-                // Actualizar UI
-                document.getElementById('uploadArea').innerHTML = `
-                    <div class="text-success">
-                        <i class="fas fa-check-circle fa-2x mb-3"></i>
-                        <h5>Archivo seleccionado</h5>
-                        <p class="mb-1">${fileName}</p>
-                        <small class="text-secondary">Tamaño: ${fileSize} MB</small>
-                    </div>
-                `;
-                
-                document.getElementById('uploadArea').classList.add('dragover');
-                setTimeout(() => {
-                    document.getElementById('uploadArea').classList.remove('dragover');
-                }, 2000);
-            }
-        }
+    }
 
-        // Drag and drop
-        const uploadArea = document.getElementById('uploadArea');
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, preventDefaults, false);
-        });
+    // Función para resetear el input de archivo
+    function resetFileInput() {
+        document.getElementById('uploadArea').innerHTML = `
+            <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-primary"></i>
+            <h5>Arrastra tu archivo o haz click aquí</h5>
+            <p class="text-secondary">Formatos: CSV, Excel (.xls, .xlsx)</p>
 
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
+            <input type="file" class="form-control mt-3" name="file" id="fileInput" 
+                   accept=".csv,.xls,.xlsx" required onchange="handleFileSelect(this)"
+                   style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: white;">
+        `;
+    }
 
-        ['dragenter', 'dragover'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, () => uploadArea.classList.add('dragover'), false);
-        });
+    // Drag and drop
+    const uploadArea = document.getElementById('uploadArea');
 
-        ['dragleave', 'drop'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('dragover'), false);
-        });
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+    });
 
-        uploadArea.addEventListener('drop', handleDrop, false);
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
 
-        function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            document.getElementById('fileInput').files = files;
-            handleFileSelect(document.getElementById('fileInput'));
-        }
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => uploadArea.classList.add('dragover'), false);
+    });
 
-        // Iniciar pago
-        function initiatePayment() {
-            showLoading();
-            
-            fetch('/create_preference', { method: 'POST' })
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('dragover'), false);
+    });
+
+    uploadArea.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        document.getElementById('fileInput').files = files;
+        handleFileSelect(document.getElementById('fileInput'));
+    }
+
+    // Iniciar pago
+    function initiatePayment() {
+        showLoading();
+
+        fetch('/create_preference', { method: 'POST' })
             .then(response => response.json())
             .then(preference => {
                 document.getElementById('loadingOverlay').style.display = 'none';
                 if (preference.init_point) {
-                    window.location.href = preference.init_point;
+                    window.location.href = preference.init_point; // abrir checkout
                 } else {
                     alert('❌ Error al iniciar el pago');
                 }
@@ -863,41 +842,44 @@
                 document.getElementById('loadingOverlay').style.display = 'none';
                 alert('❌ Error: ' + error.message);
             });
-        }
+    }
 
-        // Smooth scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
             });
         });
+    });
 
-        // Animación al hacer scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
+    // Animación al hacer scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.glass-card').forEach(card => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(30px)';
-            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            observer.observe(card);
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
         });
+    }, observerOptions);
 
-        console.log('🚀 InertiaX Platform Loaded');
-    </script>
+    document.querySelectorAll('.glass-card').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(card);
+    });
+
+    console.log('🚀 InertiaX Platform Loaded');
+</script>
+
+
+    
 </body>
 </html>
